@@ -15,5 +15,5 @@
 -- Load text extraction module.
 local extract = require 'spelling-extracttext'
 
--- Start extracting text from TeX document.
-extract.start_text_extraction()
+-- Enable text storage.
+extract.enable_text_storage()

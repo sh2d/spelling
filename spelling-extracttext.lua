@@ -330,34 +330,34 @@ local function __cb_stopr_pkg_spelling()
 end
 
 
--- Boolean variable that flags the current state of text extraction.
-local is_extract_active = false
+-- Call-back status.
+local __is_active_storage
 
 
 --- Start extracting text.
 -- After calling this function, text is extracted from a TeX document.
-local function start_text_extraction()
-  if not is_extract_active then
+local function enable_text_storage()
+  if not __is_active_storage then
     -- Register callback: Before TeX breaks a paragraph into lines,
     -- extract the text of the paragraph and store it in memory.
     luatexbase.add_to_callback('pre_linebreak_filter', __cb_plf_pkg_spelling, '__cb_plf_pkg_spelling')
-    is_extract_active = true
+    __is_active_storage = true
   end
 end
-M.start_text_extraction = start_text_extraction
+M.enable_text_storage = enable_text_storage
 
 
 --- Stop extracting text.
 -- After calling this function, no more text is extracted from a TeX
 -- document.
-local function stop_text_extraction()
-  if is_extract_active then
+local function disable_text_storage()
+  if __is_active_storage then
     -- Un-register callback.
     luatexbase.remove_from_callback('pre_linebreak_filter', '__cb_plf_pkg_spelling')
-    is_extract_active = false
+    __is_active_storage = false
   end
 end
-M.stop_text_extraction = stop_text_extraction
+M.disable_text_storage = disable_text_storage
 
 
 --- Set output EOL character.
@@ -459,6 +459,8 @@ local function __init()
   else
     set_output_eol('\n')
   end
+  -- Remember call-back status.
+  __is_active_storage = false
   -- Register callaback: at the end of the TeX run, output all extracted
   -- text.
   luatexbase.add_to_callback('stop_run', __cb_stopr_pkg_spelling, '__cb_stopr_pkg_spelling')
