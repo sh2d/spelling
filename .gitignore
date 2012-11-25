@@ -4,5 +4,8 @@ auto/
 *.aux
 *.html
 *.log
+*.out
 *.pdf
+*.toc
 *.txt
+test*
