@@ -49,6 +49,7 @@ _Happy TeXing!_
     spelling.lua
     spelling.sty
     spelling-recurse.lua
+    spelling-stage-2.lua
     spelling-stage-3.lua
     spelling-stage-4.lua
 

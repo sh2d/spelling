@@ -22,3 +22,9 @@
 \fi
 \RequirePackage{luatexbase}
 \directlua name {spelling}{dofile('spelling.lua')}
+% Words are extracted after pages have been built.  In lack of a proper
+% Lua call-back, we're hooking into shipout from the LaTeX side.
+\RequirePackage{atbegshi}
+\AtBeginShipout{%
+  \directlua name {spelling-atbeginshipout}{cb_AtBeginShipout_pkg_spelling(\the\AtBeginShipoutBox)}%
+}
