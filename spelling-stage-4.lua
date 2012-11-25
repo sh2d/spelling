@@ -109,10 +109,10 @@ M.set_output_line_length = set_output_line_length
 --- Break a paragraph into lines of a fixed length and write the lines
 --- to a file.
 --
--- @param par  A text paragraph (an array of words).
 -- @param f  A file handle.
--- @param maxlinelength  Maximum line length in output.
-local function __write_text_paragraph(par, f, maxlinelength)
+-- @param par  A text paragraph (an array of words).
+local function __write_text_paragraph(f, par)
+  local maxlinelength = __opts.output_line_length
   local eol = __opts.output_eol
   -- Index of first word on current line.  Initialize current line with
   -- first word of paragraph.
@@ -150,7 +150,7 @@ local function __write_text_document()
     -- Separate paragraphs by a blank line.
     f:write(__opts.output_eol)
     -- Write paragraph to file.
-    __write_text_paragraph(par, f, __opts.output_line_length)
+    __write_text_paragraph(f, par)
     -- Delete paragraph from memory.
     __text_document[_] = nil
   end
