@@ -83,6 +83,12 @@
     pkg_spelling_stage[4].set_output_line_length('\luaescapestring{#1}')
   }%
 }
+% Provide command for setting text output EOL character.
+\newcommand*{\spellingoutputeol}[1]{%
+  \directlua{
+    pkg_spelling_stage[4].set_output_eol('\luaescapestring{#1}')
+  }%
+}
 % Try to read a list of bad spellings from file `\jobname.spb'.
 \IfFileExists{\jobname.spb}{%
   \spellingreadbad{\jobname.spb}%
