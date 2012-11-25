@@ -29,12 +29,19 @@ local VLIST = node.id('vlist')
 local WHATSIT = node.id('whatsit')
 
 
--- With this table it is possible to translate Unicode code points to
--- arbitrary strings.  As an example, the single Unicode code point
--- U-fb00 (LATIN SMALL LIGATURE FF) can be resolved into the multi
--- character string 'ff' instead of being converted to the single
--- character string 'ﬀ'.  The resulting string must be in the UTF-8
--- encoding.
+--- Table to translate Unicode code points into arbitrary strings.
+-- As an example, the single Unicode code point U-fb00 (LATIN SMALL
+-- LIGATURE FF) can be resolved into the multi character string 'ff'
+-- instead of being converted to the single character string 'ﬀ'
+-- ('&#xfb00;').<br />
+--
+-- Keys are Unicode code points.  Values must be strings in the UTF-8
+-- encoding.  If a key is not present in this table, the regular UTF-8
+-- character is returned by means of a meta table.<br />
+--
+-- @class table
+-- @name transl_codepoint
+-- @field mt  Meta table for this table.
 local transl_codepoint = {
 
   [0x0132] = 'IJ',-- LATIN CAPITAL LIGATURE IJ
@@ -53,9 +60,20 @@ local transl_codepoint = {
   [0xfb05] = 'st',-- LATIN SMALL LIGATURE LONG S T
   [0xfb06] = 'st',-- LATIN SMALL LIGATURE ST
 
-  -- Meta table for ourselves.
+  --- Meta table for table `transl_codepoint`.<br />
+  -- @class table
+  -- @name mt
+  -- @field __index  Index operator.
   mt = {
-     --- Retrieve regular UTF-8 character as a fall-back.
+
+     --- Convert a Unicode code point to a regular UTF-8 encoded string.
+     -- This function is called upon unsuccessful look-ups in table
+     -- `transl_codepoint`.
+     --
+     -- @param t  original table
+     -- @param cp  originl key, a Unicode code point
+     -- @return UTF-8 encoded string corresponding to the Unicode code
+     -- point
      __index = function(t, cp)
                   return utf8char(cp)
                end
@@ -66,37 +84,71 @@ local transl_codepoint = {
 setmetatable(transl_codepoint, transl_codepoint.mt)
 
 
--- This table represents the document.  It contains all text of the
--- type-set document as an array of paragraphs.  A paragraph is an array
--- of single words.  At the end of the LuaTeX run, all paragraphs of the
--- document are broken into lines of a fixed length and the lines are
--- then written to a file.  Here's the rationale of this approach:
+--- Data structure that stores the text of a document.
+-- The data structure that is used to store the text of a document is
+-- quite simple.  A document is an ordered list (an array) of
+-- paragraphs.  A paragraph is an ordered list (an array) of words.  A
+-- word is a single UTF-8 encoded string.<br />
 --
--- * It saves space.  In Lua strings are internalized.  Since, in
---   general, in texts the same words are used over and over again,
---   relatively few strings are actually stored in memory.
+-- During the TeX run, node lists are scanned for words.  The words
+-- found in a node list are stored in the current paragraph.  After
+-- finishing scanning a node list, the current paragraph is inserted
+-- into this document data structure.  At the end of the TeX run, all
+-- paragraphs of the document are broken into lines of a fixed length
+-- and the lines are written to a text file.<br />
 --
--- * It reduces file access during the LuaTeX run.
+-- Here's the rationale of this approach:
 --
--- * It allows for pre-processing the document text before writing it to
---   a file.
+-- <ul>
 --
--- Create an empty document.
+-- <li> It reduces file access _during_ the TeX run by delaying write
+--   operations until the end of the TeX run.
+--
+-- <li> It saves space.  In Lua, strings are internalized.  Since, in a
+--   text the same words are used over and over again, relatively few
+--   strings are actually stored in memory.
+--
+-- <li> It allows for pre-processing the document text before writing it
+--   to a file.
+--
+-- </ul>
+--
+-- @class table
+-- @name text_document
+
+-- Create an empty text document.
 local text_document = {}
 
 
--- The current paragraph (an array of words).  This non-local variable
--- is used while searching a node list for text in function
--- `scan_nodelist_for_text`.
+--- Data structure that stores the words found while scanning a node
+--- list corresponding to a paragraph.
+-- A paragraph is an ordered list (an array) of words.  A word is a
+-- single UTF-8 encoded string.
+--
+-- @class table
+-- @name curr_paragraph
+
+-- Create an empty text paragraph.
 local curr_paragraph = {}
--- The current word (an array of UTF-8 encoded strings).  This non-local
--- variable is used while searching a node list for text in function
--- `scan_nodelist_for_text`.
+
+
+--- Data structure that stores the characters of a word while scanning a
+--- node list corresponding to a paragraph.
+-- The current word data structure is not a plain string, but an ordered
+-- list (an array) of the characters of a word.  The characters are
+-- collected while scanning a node list.  They are concatenated to a
+-- single string only after the end of a word is detected, before
+-- inserting the current word into the current paragraph data structure.
+--
+-- @class table
+-- @name curr_word
+
+-- Create an empty word in table representation.
 local curr_word = {}
 
 
 --- Finish current paragraph and start a new one.
--- The current paragraph is finished: The current word, if non-empty is
+-- The current paragraph is finished: If non-empty, the current word is
 -- appended to the current paragraph, which in turn, if non-empty, is
 -- appended to the document structure.  After calling this function, the
 -- current word and current paragraph are empty.
@@ -116,7 +168,7 @@ end
 
 --- Scan a node list for text and append that to the document structure.
 -- The given node list is scanned for chaines of nodes representing a
--- word.  These words are stored as a list of UTF-8 encoded strings.
+-- word.  These words are stored in the current paragraph.
 --
 -- @param head  Node list.
 local function scan_nodelist_for_text(head)
@@ -133,7 +185,7 @@ local function scan_nodelist_for_text(head)
       start_text_paragraph()
     -- Test for hlist node.
     elseif nid == HLIST then
-      -- Recurse into hlist.
+      -- Seamlessly recurse into hlist as if it were non-existent.
       scan_nodelist_for_text(n.head)
     -- Test for glyph node.
     elseif nid == GLYPH then
@@ -141,7 +193,7 @@ local function scan_nodelist_for_text(head)
       tabinsert(curr_word, transl_codepoint[n.char])
     -- Test for other word component nodes.
     elseif (nid == DISC) or (nid == KERN) or (nid == PUNCT) then
-      -- Do nothing.
+      -- We're still within the current word.  Do nothing.
     else
       -- End of current word detected.  If non-empty, append current
       -- word to current paragraph, converting it from table to string
@@ -222,7 +274,7 @@ local function write_text_document()
     f:write('\n')
     -- Write paragraph to file.
     write_text_paragraph(par, f, 72)
-    -- Delete written paragraph.
+    -- Delete paragraph from memory.
     par = nil
   end
   -- Close output file.
@@ -237,5 +289,10 @@ end
 
 
 -- Register callback functions.
+--
+-- Before TeX breaks a paragraph into lines, extract the text of the
+-- paragraph and store it in memory.
 luatexbase.add_to_callback('pre_linebreak_filter', cb_plf_pkg_spelling, 'cb_plf_pkg_spelling')
+--
+-- At the end of the TeX run, output all extracted text.
 luatexbase.add_to_callback('stop_run', cb_stopr_pkg_spelling, 'cb_stopr_pkg_spelling')
