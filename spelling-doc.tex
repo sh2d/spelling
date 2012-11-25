@@ -27,6 +27,8 @@ language={[LaTeX]TeX},
 basicstyle=\ttfamily,
 ]°
 \usepackage{xspace}
+\usepackage{array}
+\usepackage{booktabs}
 \usepackage[latin, UKenglish]{babel}
 \usepackage[rgb, x11names]{xcolor}
 \usepackage{hyperref}
@@ -337,6 +339,70 @@ Note, text extraction and visual feedback are orthogonal features.  That
 is, if text extraction is disabled for part of a document, \lpeg, a long
 table, words with a known incorrect spelling are still highlighted in
 that part.
+
+
+\subsection{Code point mapping}
+\label{sec:cp-mapping}
+
+As explained in \autoref{sec:textoutput}, the text file written at the
+end of the Lua\TeX\ run is in the \acr{utf-8} encoding.  Unicode
+contains a wealth of code points with a special meaning, such as
+ligatures, alternative letters, symbols \lpetc Unfortunately, not all
+spell-checker applications are smart enough to correctly interpret all
+Unicode code points that may occur in a document.  For that reason, a
+code point mapping feature has been implemented that allows for mapping
+certain Unicode code points that may appear in a node list to arbitrary
+strings in text output.  A typical example is to map ligatures to the
+characters corresponding to their constituting letters.  The default
+mappings applied can be found in \autoref{tab:cp-mapping}.
+
+\begin{table}
+  \centering
+
+  \begin{tabular}{>{\ttfamily}l>{\ttfamily}l>{\ttfamily}l}
+    \normalfont Unicode name & \normalfont code point & \normalfont target characters\\
+    \addlinespace
+    \toprule
+    \addlinespace
+
+    LATIN CAPITAL LIGATURE IJ & 0x0132 & IJ\\
+    LATIN SMALL LIGATURE IJ & 0x0133 & ij\\
+    LATIN CAPITAL LIGATURE OE & 0x0152 & OE\\
+    LATIN SMALL LIGATURE OE & 0x0153 & oe\\
+    LATIN SMALL LETTER LONG S & 0x017f & s\\
+    LATIN CAPITAL LETTER SHARP S & 0x1e9e & SS\\
+    LATIN SMALL LIGATURE FF & 0xfb00 & ff\\
+    LATIN SMALL LIGATURE FI & 0xfb01 & fi\\
+    LATIN SMALL LIGATURE FL & 0xfb02 & fl\\
+    LATIN SMALL LIGATURE FFI & 0xfb03 & ffi\\
+    LATIN SMALL LIGATURE FFL & 0xfb04 & ffl\\
+    LATIN SMALL LIGATURE LONG S T & 0xfb05 & st\\
+    LATIN SMALL LIGATURE ST & 0xfb06 & st\\
+  \end{tabular}
+
+  \caption{Default code point mappings.}
+  \label{tab:cp-mapping}
+
+\end{table}
+
+Additional mappings can be declared by command \macro{spellingmapping}.
+This command takes two arguments, a number that refers to the Unicode
+code point, and a sequence of arbitrary characters that is the mapping
+target.  The code point number must be in a format that can be parsed by
+Lua.  The characters must be in the \acr{utf-8} encoding.
+
+New mappings only have effect on the following document text.  The
+command should therefore be used in the document preamble.  As an
+example, the character |A| can be mapped to |Z| and \latinphrase{vice
+  versa} with the following code:
+
+\begin{lstlisting}[language={[LaTeX]TeX}]
+\spellingmapping{65}{Z}% A => Z
+\spellingmapping{90}{A}% Z => A
+\end{lstlisting}
+
+Another command \macro{spellingclearallmappings} can be used to remove
+all existing code point mappings.
 
 
 \end{document}

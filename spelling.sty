@@ -101,6 +101,21 @@
     }%
   }%
 }
+% Provide command to declare code point mappings.
+\newcommand*{\spellingmapping}[2]{%
+  \directlua{
+    local r = pkg_spelling_stage[2].set_mapping(\luaescapestring{#1}, '\luaescapestring{#2}')
+    if r == false then
+      texio.write_nl('package spelling: invalid mapping: \luaescapestring{#1} => \luaescapestring{#2}')
+    end
+  }%
+}
+% Provide command to clear all existing code point mappings.
+\newcommand*{\spellingclearallmappings}{%
+  \directlua{
+    pkg_spelling_stage[2].clear_all_mappings()
+  }%
+}
 % Try to read a list of bad spellings from file `\jobname.spb'.
 \IfFileExists{\jobname.spb}{%
   \spellingreadbad{\jobname.spb}%
