@@ -52,6 +52,7 @@ basicstyle=\ttfamily,
 \newcommand*{\macro}[1]{\cmd{#1}\marginpar{\cmd{#1}}}
 \newcommand*{\latinphrase}[1]{\foreignlanguage{latin}{\emph{#1}}}
 \newcommand*{\lpeg}{\latinphrase{e.\,g.}\xspace}
+\newcommand*{\lpetc}{\latinphrase{etc.}\xspace}
 \newcommand*{\lpie}{\latinphrase{i.\,e.}\xspace}
 \begin{document}
 \author{Stephan Hennig\thanks{sh2d@arcor.de}}
@@ -232,6 +233,45 @@ represented by |0 1 1 0 k|.  Default colour used for highlighting is %
 |1 0 0 rg|, \lpie, red in the \acr{rgb} colour space.  \emph{Warning:
   There's currently no error checking.  Make sure, you're applying a
   valid PDF colour statement!}
+
+
+\subsection{Text output}
+\label{sec:textoutput}
+
+\paragraph{Text file} After loading the \pkg\ package, at the end of the
+Lua\TeX\ run, a text file is written that contains most of the document
+text.  The text file is no close text rendering of the typeset document,
+but serves as input for your favourite spell-checker application.  It
+contains the document text in a simple format: paragraphs separated by
+blank lines.  A paragraph is anything that, during typesetting, starts
+with a |local_par| whatsit node in the node list representing a typeset
+page of the original document, \lpeg, paragraphs in running text,
+footnotes, marginal notes, (in-lined) °\parbox° commands or cells from
+°p°-like table columns \lpetc
+
+Paragraphs consist of words separated by spaces.  A word is the textual
+representation of a chain of consecutive nodes of type |glyph|, |disc|
+or |kern|.  Boxes are processed transparently.  That is, the \pkg\
+package (highly imperfectly) tries to recognise as a single word what in
+typeset output looks like a single word.  As an example, the \LaTeX\
+code
+
+\begin{center}
+  \begin{tabular}{c}
+\begin{lstlisting}[language={[LaTeX]TeX}]
+foo\mbox{'s bar}s
+\end{lstlisting}
+  \end{tabular}
+\end{center}
+which is typeset as
+
+\begin{center}
+  foo\mbox{'s bar}s
+\end{center}
+is considered two words \textit{foo's} and \textit{bars}, instead of the
+four words \textit{foo}, \textit{'s}, \textit{bar} and~\textit{s}.%
+\footnote{This document has been compiled with a custom list of bad
+  spellings, which is why the word \emph{foo's} should be highlighted.}
 
 
 \end{document}
