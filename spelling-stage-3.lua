@@ -75,6 +75,39 @@ end
 M.set_resources = set_resources
 
 
+--- Module options.
+-- This table contains all module options.  User functions to set
+-- options are provided.
+--
+-- @class table
+-- @name __opts
+-- @field table_par  When processing a table, when should paragraphs be
+-- inserted into the text document?<br />
+--
+-- <ul>
+-- <li> 0 - Don't touch tables in any way.</li>
+-- <li> 1 - Insert paragraphs before and after hlists of type
+--            <i>alignment column or row</i>, i.e., before and after
+--            every table row.</li>
+-- <li> 2 - Insert paragraphs before and after hlists of type
+--            <i>alignment cell</i>, i.e., before and after every table
+--            cell.</li>
+-- </ul>
+local __opts = {
+  table_par,
+}
+
+
+--- Set table behaviour.
+-- Determine when paragraphs are inserted within tables.
+--
+-- @param value  New value.
+local function set_table_paragraphs(value)
+  __opts.table_par = value
+end
+M.set_table_paragraphs = set_table_paragraphs
+
+
 --- Data structure that stores the word strings found in a node list.
 --
 -- @class table
@@ -138,6 +171,22 @@ local function __vlist_post_recurse()
 end
 
 
+--- Handle tables lines and cells.
+-- Start a new paragraph before and after an hlist of subtype `alignment
+-- column or row` or `alignment cell`, depending on option `table_par`.
+--
+-- @param n  hlist node.
+local function __handle_table(n)
+  local subtype = n.subtype
+  local table_par = __opts.table_par
+  if (subtype == 4) and (table_par == 1) then
+    __finish_current_paragraph()
+  elseif (subtype == 5) and (table_par == 2) then
+    __finish_current_paragraph()
+  end
+end
+
+
 --- Find paragraphs and strings.
 -- While scanning a node list, this call-back function finds nodes
 -- representing the start of a paragraph (local_par whatsit nodes) and
@@ -178,11 +227,15 @@ end
 -- @name __cb_store_words
 -- @field vlist_pre_recurse  Paragraph management.
 -- @field vlist_post_recurse  Paragraph management.
+-- @field hlist_pre_recurse  Table management.
+-- @field hlist_post_recurse  Table management.
 -- @field visit_node  Find nodes representing paragraphs and words.
 local __cb_store_words = {
 
   vlist_pre_recurse = __vlist_pre_recurse,
   vlist_post_recurse = __vlist_post_recurse,
+  hlist_pre_recurse = __handle_table,
+  hlist_post_recurse = __handle_table,
   visit_node = __visit_node,
 
 }
@@ -239,6 +292,8 @@ local function __init()
   __is_vlist_paragraph = {}
   -- Remember call-back status.
   __is_active_storage = false
+  -- Set default table paragraph behaviour.
+  set_table_paragraphs(0)
 end
 
 

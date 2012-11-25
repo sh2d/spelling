@@ -53,6 +53,7 @@ basicstyle=\ttfamily,
 \newcommand*{\cmd}[1]{\mbox{\ttfamily\textbackslash#1}}
 \newcommand*{\macro}[1]{\cmd{#1}\marginpar{\cmd{#1}}}
 \newcommand*{\latinphrase}[1]{\foreignlanguage{latin}{\emph{#1}}}
+\newcommand*{\lpcf}{\latinphrase{cf.}\xspace}
 \newcommand*{\lpeg}{\latinphrase{e.\,g.}\xspace}
 \newcommand*{\lpetc}{\latinphrase{etc.}\xspace}
 \newcommand*{\lpie}{\latinphrase{i.\,e.}\xspace}
@@ -403,6 +404,25 @@ example, the character |A| can be mapped to |Z| and \latinphrase{vice
 
 Another command \macro{spellingclearallmappings} can be used to remove
 all existing code point mappings.
+
+
+\subsection{Tables}
+\label{sec:tables}
+
+How do tables fit into the simple text file format that has only
+paragraphs and blank lines as described in \autoref{sec:textoutput}?
+What is a paragraph with regards to tables?  A whole table?  A row?  A
+single cell?
+
+By default, only text from cells in °p°(aragraph)-like columns is put on
+their own paragraph, because the corresponding node list branches
+contain a |local_par| whatsit node (\lpcf \autoref{sec:textoutput}).
+The behaviour can be changed with the \macro{spellingtablepar} command.
+This command takes as argument a number.  If the argument is~0, the
+behaviour is described as above.  If the argument is~1, a blank line is
+inserted before and after every table row (but at most once between
+table rows).  If the argument is~2, a blank line is inserted before and
+after every table cell.  By default, no blank lines are inserted.
 
 
 \end{document}

@@ -116,6 +116,12 @@
     pkg_spelling_stage[2].clear_all_mappings()
   }%
 }
+% Provide command to specify table paragraph behaviour.
+\newcommand*{\spellingtablepar}[1]{%
+  \directlua{
+    pkg_spelling_stage[3].set_table_paragraphs(\luaescapestring{#1})
+  }%
+}
 % Try to read a list of bad spellings from file `\jobname.spb'.
 \IfFileExists{\jobname.spb}{%
   \spellingreadbad{\jobname.spb}%
