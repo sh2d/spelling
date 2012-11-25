@@ -29,6 +29,17 @@ local VLIST = node.id('vlist')
 local WHATSIT = node.id('whatsit')
 
 
+--- Convert a Unicode code point to a regular UTF-8 encoded string.
+-- This function can be used as an `__index` meta method.
+--
+-- @param t  original table
+-- @param cp  originl key, a Unicode code point
+-- @return UTF-8 encoded string corresponding to the Unicode code point.
+local function __meta_cp2utf8(t, cp)
+  return utf8char(cp)
+end
+
+
 --- Table to translate Unicode code points into arbitrary strings.
 -- As an example, the single Unicode code point U-fb00 (LATIN SMALL
 -- LIGATURE FF) can be resolved into the multi character string 'ff'
@@ -41,7 +52,6 @@ local WHATSIT = node.id('whatsit')
 --
 -- @class table
 -- @name transl_codepoint
--- @field mt  Meta table for this table.
 local transl_codepoint = {
 
   [0x0132] = 'IJ',-- LATIN CAPITAL LIGATURE IJ
@@ -60,28 +70,15 @@ local transl_codepoint = {
   [0xfb05] = 'st',-- LATIN SMALL LIGATURE LONG S T
   [0xfb06] = 'st',-- LATIN SMALL LIGATURE ST
 
-  --- Meta table for table `transl_codepoint`.<br />
-  -- @class table
-  -- @name mt
-  -- @field __index  Index operator.
-  mt = {
-
-     --- Convert a Unicode code point to a regular UTF-8 encoded string.
-     -- This function is called upon unsuccessful look-ups in table
-     -- `transl_codepoint`.
-     --
-     -- @param t  original table
-     -- @param cp  originl key, a Unicode code point
-     -- @return UTF-8 encoded string corresponding to the Unicode code
-     -- point
-     __index = function(t, cp)
-                  return utf8char(cp)
-               end
-  }
-
 }
+
+
 -- Set meta table for code point translation table.
-setmetatable(transl_codepoint, transl_codepoint.mt)
+setmetatable(transl_codepoint,
+             {
+               __index = __meta_cp2utf8,
+             }
+)
 
 
 --- Data structure that stores the text of a document.
