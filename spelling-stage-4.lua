@@ -36,22 +36,6 @@ local tabconcat = table.concat
 local utf8len = unicode.utf8.len
 
 
---- Module options.
--- This table contains all module options.  User functions to set
--- options are provided.
---
--- @class table
--- @name __opts
--- @field output_eol  End-of-line  character in output.
--- @field output_file_name  Output file name.
--- @field output_line_length  Line length in output.
-local __opts = {
-  output_eol,
-  output_file_name,
-  output_line_lenght,
-}
-
-
 -- Declare local variables to store references to resources that are
 -- provided by external code.
 --
@@ -68,6 +52,58 @@ local function set_resources(res)
   __text_document = res.text_document
 end
 M.set_resources = set_resources
+
+
+--- Module options.
+-- This table contains all module options.  User functions to set
+-- options are provided.
+--
+-- @class table
+-- @name __opts
+-- @field output_eol  End-of-line  character in output.
+-- @field output_file_name  Output file name.
+-- @field output_line_length  Line length in output.
+local __opts = {
+  output_eol,
+  output_file_name,
+  output_line_lenght,
+}
+
+
+--- Set output EOL character.
+-- Text output will be written with the given end-of-line character.
+--
+-- @param eol  New output EOL character.
+local function set_output_eol(eol)
+  __opts.output_eol = eol
+end
+M.set_output_eol = set_output_eol
+
+
+--- Set output file name.
+-- Text output will be written to a file with the given name.
+--
+-- @param name  New output file name.
+local function set_output_file_name(name)
+  __opts.output_file_name = name
+end
+M.set_output_file_name = set_output_file_name
+
+
+--- Set output line length.
+-- Set the number of columns in text output.  Text output will be
+-- wrapped at spaces so that lines don't contain more than the specified
+-- number of characters per line.  There's one exception: if a word is
+-- longer than the specified number of characters, the word is put on
+-- its own line and that line will be overfull.
+--
+-- @param cols  New line length in output.  If the argument is smaller
+-- than 1, lines aren't wrapped, i.e., all text of a paragraph is put on
+-- a single line.
+local function set_output_line_length(cols)
+  __opts.output_line_length = cols
+end
+M.set_output_line_length = set_output_line_length
 
 
 --- Break a paragraph into lines of a fixed length and write the lines
@@ -127,42 +163,6 @@ end
 local function __cb_stopr_pkg_spelling()
   __write_text_document()
 end
-
-
---- Set output EOL character.
--- Text output will be written with the given end-of-line character.
---
--- @param eol  New output EOL character.
-local function set_output_eol(eol)
-  __opts.output_eol = eol
-end
-M.set_output_eol = set_output_eol
-
-
---- Set output file name.
--- Text output will be written to a file with the given name.
---
--- @param name  New output file name.
-local function set_output_file_name(name)
-  __opts.output_file_name = name
-end
-M.set_output_file_name = set_output_file_name
-
-
---- Set output line length.
--- Set the number of columns in text output.  Text output will be
--- wrapped at spaces so that lines don't contain more than the specified
--- number of characters per line.  There's one exception: if a word is
--- longer than the specified number of characters, the word is put on
--- its own line and that line will be overfull.
---
--- @param cols  New line length in output.  If the argument is smaller
--- than 1, lines aren't wrapped, i.e., all text of a paragraph is put on
--- a single line.
-local function set_output_line_length(cols)
-  __opts.output_line_length = cols
-end
-M.set_output_line_length = set_output_line_length
 
 
 -- Call-back status.

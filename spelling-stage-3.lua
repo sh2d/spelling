@@ -133,6 +133,56 @@ local __meta_codepoint_map = {
 setmetatable(__codepoint_map, __meta_codepoint_map)
 
 
+--- Clear all code point mappings.
+-- After calling this function, there are no known code point mappings
+-- and no code point mapping takes place during text extraction.
+local function clear_all_mappings()
+  __codepoint_map = {}
+  setmetatable(__codepoint_map, __meta_codepoint_map)
+end
+M.clear_all_mappings = clear_all_mappings
+
+
+--- Manage Unicode code point mappings.
+-- This function can be used to set-up code point mappings.  First
+-- argument must be a number, second argument must be a string in the
+-- UTF-8 encoding or `nil`.<br />
+--
+-- If the second argument is a string, after calling this function, the
+-- Unicode code point given as first argument, when found in a node list
+-- during text extraction, is mapped to the string given as second
+-- argument instead of being converted to a UTF-8 encoded character
+-- corresponding to the code point.<br />
+--
+-- If the second argument is `nil`, a mapping for the given code point,
+-- if existing, is deleted.
+--
+-- @param cp A Unicode code point, e.g., 0xfb00 for the code point LATIN
+-- SMALL LIGATURE FF.
+-- @param newt  New target string to map the code point to or `nil`.
+-- @return Old target string the code point was mapped to before
+-- (possibly `nil`).  If any arguments are invalid, return value is
+-- `false`.  Arguments are invalid if code point is not of type `number`
+-- or not in the range 0 to 0x10ffff or if new target string is neither
+-- of type `string` nor `nil`).
+local function set_mapping(cp, newt)
+  -- Prevent from invalid entries in mapping table.
+  if (type(cp) ~= 'number') or
+     (cp < 0) or
+     (cp > 0x10ffff) or
+     ((type(newt) ~= 'string') and (type(newt) ~= 'nil')) then
+    return false
+  end
+  -- Retrieve old mapping.
+  local oldt = rawget(__codepoint_map, cp)
+  -- Set new mapping.
+  __codepoint_map[cp] = newt
+  -- Return old mapping.
+  return oldt
+end
+M.set_mapping = set_mapping
+
+
 --- Data structure that stores the word strings found in a node list.
 --
 -- @class table
@@ -275,56 +325,6 @@ local function disable_text_storage()
   end
 end
 M.disable_text_storage = disable_text_storage
-
-
---- Clear all code point mappings.
--- After calling this function, there are no known code point mappings
--- and no code point mapping takes place during text extraction.
-local function clear_all_mappings()
-  __codepoint_map = {}
-  setmetatable(__codepoint_map, __meta_codepoint_map)
-end
-M.clear_all_mappings = clear_all_mappings
-
-
---- Manage Unicode code point mappings.
--- This function can be used to set-up code point mappings.  First
--- argument must be a number, second argument must be a string in the
--- UTF-8 encoding or `nil`.<br />
---
--- If the second argument is a string, after calling this function, the
--- Unicode code point given as first argument, when found in a node list
--- during text extraction, is mapped to the string given as second
--- argument instead of being converted to a UTF-8 encoded character
--- corresponding to the code point.<br />
---
--- If the second argument is `nil`, a mapping for the given code point,
--- if existing, is deleted.
---
--- @param cp A Unicode code point, e.g., 0xfb00 for the code point LATIN
--- SMALL LIGATURE FF.
--- @param newt  New target string to map the code point to or `nil`.
--- @return Old target string the code point was mapped to before
--- (possibly `nil`).  If any arguments are invalid, return value is
--- `false`.  Arguments are invalid if code point is not of type `number`
--- or not in the range 0 to 0x10ffff or if new target string is neither
--- of type `string` nor `nil`).
-local function set_mapping(cp, newt)
-  -- Prevent from invalid entries in mapping table.
-  if (type(cp) ~= 'number') or
-     (cp < 0) or
-     (cp > 0x10ffff) or
-     ((type(newt) ~= 'string') and (type(newt) ~= 'nil')) then
-    return false
-  end
-  -- Retrieve old mapping.
-  local oldt = rawget(__codepoint_map, cp)
-  -- Set new mapping.
-  __codepoint_map[cp] = newt
-  -- Return old mapping.
-  return oldt
-end
-M.set_mapping = set_mapping
 
 
 --- Module initialisation.
