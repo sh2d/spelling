@@ -298,6 +298,10 @@ local function __highlight_bad_word()
 end
 
 
+-- Tagging status.
+local __is_active_tagging
+
+
 -- Highlighting status.
 local __is_active_highlighting
 
@@ -344,7 +348,9 @@ local function __finish_current_word()
       return
     end
     -- Tag node list with word string.
-    __tag_word(word)
+    if __is_active_tagging then
+      __tag_word(word)
+    end
     -- Test for bad spelling.
     if __is_active_highlighting and __is_bad[word] and not __is_good[word] then
       __highlight_bad_word()
@@ -484,20 +490,11 @@ local function __cb_pre_linebreak_filter_pkg_spelling(head)
 end
 
 
--- Call-back status.
-local __is_active_tagging
-
-
 --- Start tagging text.
 -- After calling this function, words are tagged in node lists before
 -- hyphenation takes place.
 local function enable_text_tagging()
-  if not __is_active_tagging then
-    -- Register call-back: Before LuaTeX breaks a paragraph into lines,
-    -- extract the text of the paragraph and store it in memory.
-    luatexbase.add_to_callback('pre_linebreak_filter', __cb_pre_linebreak_filter_pkg_spelling, '__cb_pre_linebreak_filter_pkg_spelling')
-    __is_active_tagging = true
-  end
+  __is_active_tagging = true
 end
 M.enable_text_tagging = enable_text_tagging
 
@@ -506,11 +503,7 @@ M.enable_text_tagging = enable_text_tagging
 -- After calling this function, no more word tagging in node lists takes
 -- place.
 local function disable_text_tagging()
-  if __is_active_tagging then
-    -- Un-register callback.
-    luatexbase.remove_from_callback('pre_linebreak_filter', '__cb_pre_linebreak_filter_pkg_spelling')
-    __is_active_tagging = false
-  end
+  __is_active_tagging = false
 end
 M.disable_text_tagging = disable_text_tagging
 
@@ -538,12 +531,15 @@ M.disable_word_highlighting = disable_word_highlighting
 local function __init()
   -- Create empty paragraph management stack.
   __is_vlist_paragraph = {}
-  -- Remember call-back status.
+  -- Remember tagging status.
   __is_active_tagging = false
   -- Remember highlighting status.
   __is_active_highlighting = false
   -- Set default highlighting colour.
   set_highlight_color('1 0 0 rg')
+  -- Register call-back: Before TeX breaks a paragraph into lines, tag
+  -- and highlight strings.
+  luatexbase.add_to_callback('pre_linebreak_filter', __cb_pre_linebreak_filter_pkg_spelling, '__cb_pre_linebreak_filter_pkg_spelling')
 end
 
 
