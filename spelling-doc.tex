@@ -51,6 +51,7 @@ basicstyle=\ttfamily,
 \newcommand*{\macro}[1]{\cmd{#1}\marginpar{\cmd{#1}}}
 \newcommand*{\latinphrase}[1]{\foreignlanguage{latin}{\emph{#1}}}
 \newcommand*{\lpeg}{\latinphrase{e.\,g.}\xspace}
+\newcommand*{\lpie}{\latinphrase{i.\,e.}\xspace}
 \begin{document}
 \author{Stephan Hennig\thanks{sh2d@arcor.de}}
 \title{\pkg\thanks{This document describes the \pkg\ package v0.1.}}
@@ -220,6 +221,16 @@ with known incorrect spelling) in \acr{pdf} output can be toggled on and
 off with command \macro{spellinghighlight}.  If the argument is |on|,
 highlighting is enabled.  For other arguments, highlighting is disabled.
 Highlighting is enabled, by default.
+
+\paragraph{Colour} The colour used for highlighting bad spellings can be
+determined by command \cmd{spellinghighlightcolor}.  Argument is a
+colour statement in the \acr{pdf} language.  As an example, the colour
+red in the \acr{rgb} colour space is represented by the statement %
+|1 0 0 rg|.  In the \acr{cmyk} colour space, a reddish colour is
+represented by |0 1 1 0 k|.  Default colour used for highlighting is %
+|1 0 0 rg|, \lpie, red in the \acr{rgb} colour space.  \emph{Warning:
+  There's currently no error checking.  Make sure, you're applying a
+  valid PDF colour statement!}
 
 
 \end{document}

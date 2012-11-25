@@ -53,6 +53,12 @@
     }%
   }%
 }
+% Provide command for setting visual feedback colour.
+\newcommand*{\spellinghighlightcolor}[1]{%
+  \directlua{
+    pkg_spelling_stage[2].set_highlight_color('\luaescapestring{#1}')
+  }%
+}
 % Try to read a list of bad spellings from file `\jobname.spb'.
 \IfFileExists{\jobname.spb}{%
   \spellingreadbad{\jobname.spb}%
