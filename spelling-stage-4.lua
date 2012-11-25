@@ -144,7 +144,8 @@ end
 --
 local function __write_text_document()
   -- Open output file.
-  local f = assert(io.open(__opts.output_file_name, 'wb'))
+  local fname = __opts.output_file_name or (tex.jobname .. '.txt')
+  local f = assert(io.open(fname, 'wb'))
   -- Iterate through document paragraphs.
   for _,par in ipairs(__text_document) do
     -- Separate paragraphs by a blank line.
@@ -199,7 +200,7 @@ M.disable_text_output = disable_text_output
 --
 local function __init()
   -- Set default output file name.
-  set_output_file_name(tex.jobname .. '.txt')
+  set_output_file_name(nil)
   -- Set default output line length.
   set_output_line_length(72)
   -- Set default output EOL character.
