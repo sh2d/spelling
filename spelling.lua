@@ -103,6 +103,40 @@ local function build_text_paragraph(head)
 end
 
 
+--- Write the text of a node list to a file.
+-- The node list is not manipulated.
+--
+-- @param head  Node list.
+local function nodelist_to_text(head)
+  local par = build_text_paragraph(head)
+  write_paragraph(fd, 72, par)
+end
+
+
+--- Callback function that scans a node list for text and stores that in
+--- the document structure.
+-- The node list is not manipulated.
+--
+-- @param head  Node list.
+-- @return true
+local function cb_plf_pkg_spelling(head)
+  nodelist_to_text(head)
+  return true
+end
+
+
+--- Callback function that scans a node list for text and stores that in
+--- the document structure.
+-- The node list is not manipulated.
+--
+-- @param head  Node list.
+-- @return true
+local function cb_hf_pkg_spelling(head)
+  nodelist_to_text(head)
+  return true
+end
+
+
 --- Write the words of a paragraph to a file with a fixed line length.
 -- @param f  A file handle.
 -- @param maxlinelength  Maximum line length in output.
@@ -137,20 +171,9 @@ write_paragraph = function(f, maxlinelength, par)
 end
 
 
---- Callback function that writes the words of a node list to a file.
--- The node list is not manipulated.
--- @param head  Node list.
--- @return true
-totext = function(head)
-  local par = build_text_paragraph(head)
-  write_paragraph(fd, 72, par)
-  return true
-end
-
-
--- Register callback function.
-luatexbase.add_to_callback("pre_linebreak_filter", totext, "totext")
-luatexbase.add_to_callback("hpack_filter", totext, "totext")
+-- Register callback functions.
+luatexbase.add_to_callback('pre_linebreak_filter', cb_plf_pkg_spelling, 'cb_plf_pkg_spelling')
+luatexbase.add_to_callback('hpack_filter', cb_hf_pkg_spelling, 'cb_hf_pkg_spelling')
 
 
 --~ fd:close()
