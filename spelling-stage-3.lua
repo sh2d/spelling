@@ -45,6 +45,7 @@ local __recurse_node_list = __recurse.recurse_node_list
 -- Function short-cuts.
 local tabconcat = table.concat
 local tabinsert = table.insert
+local tabremove = table.remove
 local utf8char = unicode.utf8.char
 
 
@@ -54,6 +55,7 @@ local GLYPH = node.id('glyph')
 local KERN = node.id('kern')
 local PUNCT = node.id('punct')
 local WHATSIT = node.id('whatsit')
+local LOCAL_PAR = node.subtype('local_par')
 
 
 -- Declare local variables to store references to resources that are
@@ -238,9 +240,38 @@ local function __finish_current_paragraph()
 end
 
 
---- Find chains of nodes representing a string.
--- While scanning a node list, this call-back function identifies chains
--- of nodes representing a string.
+--- Paragraph management stack.
+-- Stack of boolean flags, that are used for logging the occurence of a
+-- new paragraph within nested vlists.
+local __is_vlist_paragraph
+
+
+--- Paragraph management.
+-- This function puts a new boolean flag onto a stack that is used to
+-- log the occurence of a new paragraph, while recursing into the coming
+-- vlist.  After finishing recursing into the vlist, the flag needs to
+-- be removed from the stack.  Depending on the flag, the then current
+-- paragraph can be finished.
+local function __vlist_pre_recurse()
+  tabinsert(__is_vlist_paragraph, false)
+end
+
+
+--- Paragraph management.
+-- Remove flag from stack after recursing into a vlist.  If necessary,
+-- finish the current paragraph.
+local function __vlist_post_recurse()
+  local p = tabremove(__is_vlist_paragraph)
+  if p then
+    __finish_current_paragraph()
+  end
+end
+
+
+--- Find paragraphs and strings.
+-- While scanning a node list, this call-back function finds nodes
+-- representing the start of a paragraph (local_par whatsit nodes) and
+-- strings (chains of nodes of type glyph, kern, disc).
 --
 -- @param head  Head node of current branch.
 -- @param n  The current node.
@@ -257,6 +288,10 @@ local function __visit_node(head, n)
   -- Test for other word string component nodes.
   elseif (nid == DISC) or (nid == KERN) then
     -- We're still within the current word string.  Do nothing.
+  -- Test for paragraph start.
+  elseif (nid == WHATSIT) and (n.subtype == LOCAL_PAR) then
+    __finish_current_paragraph()
+    __is_vlist_paragraph[#__is_vlist_paragraph] = true
   else
     -- End of current word string detected.
     __finish_current_word()
@@ -268,20 +303,21 @@ end
 --- word strings found in a node list.
 -- The call-back functions in this table identify chains of nodes
 -- representing word strings in a node list and stores the strings in
--- the text document.  Before and after nodes of type `vlist`, a new
--- paragraph is started.  Nodes of type `hlist` are recursed into as if
--- they were non-existent.  That is, the LaTeX input `a\mbox{a b}b` is
--- recognized as two word strings `aa` and `bb`.
+-- the text document.  A new paragraph is started at local_par whatsit
+-- nodes and after finishing a vlist containing a local_par whatsit
+-- node.  Nodes of type `hlist` are recursed into as if they were
+-- non-existent.  As an example, the LaTeX input `a\mbox{a b}b` is
+-- recognized as two strings `aa` and `bb`.
 --
 -- @class table
 -- @name __cb_store_words
--- @field vlist_pre_recurse  Finish current paragraph.
--- @field vlist_post_recurse  Finish current paragraph.
--- @field visit_node  Find nodes representing a word string.
+-- @field vlist_pre_recurse  Paragraph management.
+-- @field vlist_post_recurse  Paragraph management.
+-- @field visit_node  Find nodes representing paragraphs and words.
 local __cb_store_words = {
 
-  vlist_pre_recurse = __finish_current_paragraph,
-  vlist_post_recurse = __finish_current_paragraph,
+  vlist_pre_recurse = __vlist_pre_recurse,
+  vlist_post_recurse = __vlist_post_recurse,
   visit_node = __visit_node,
 
 }
@@ -344,6 +380,8 @@ M.disable_text_storage = disable_text_storage
 --- Module initialisation.
 --
 local function __init()
+  -- Create empty paragraph management stack.
+  __is_vlist_paragraph = {}
   -- Remember call-back status.
   __is_active_storage = false
 end
