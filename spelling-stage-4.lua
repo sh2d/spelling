@@ -146,10 +146,11 @@ local function __write_text_document()
   -- Open output file.
   local fname = __opts.output_file_name or (tex.jobname .. '.txt')
   local f = assert(io.open(fname, 'wb'))
+  local eol = __opts.output_eol
   -- Iterate through document paragraphs.
   for _,par in ipairs(__text_document) do
     -- Separate paragraphs by a blank line.
-    f:write(__opts.output_eol)
+    f:write(eol)
     -- Write paragraph to file.
     __write_text_paragraph(f, par)
     -- Delete paragraph from memory.
