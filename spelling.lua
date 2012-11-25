@@ -92,73 +92,95 @@ cp2utf8 = function(cp)
 end
 
 
-line = ''
-llen = 0
-
-output_word = function(start, stop)
-  local n = start
-  local nlen = node.length(start, stop)
---~ 	fd:write('Länge: ', len, '  ')
-  local i = 1
-  local s = ''
-  local slen = 0
-  while (i <= nlen) do
-    if n.id == 37 then
-      s = s .. cp2utf8(n.char)
-      slen = slen + 1
---~     elseif n.id == 7 then
---~       s = s .. '_'
---~     elseif n.id == 11 then
---~       s = s .. '|'
---~     elseif n.id == 22 then
---~       s = s .. '_22_'
+--- Scan a node list for words.
+-- The given node list is scanned for chaines of nodes representing a
+-- word.  These words are stored as a list of UTF-8 encoded strings.
+-- @param head  Node list.
+-- @return A list of UTF-8 encoded strings.
+build_paragraph = function(head)
+  -- Flag, if we're processing a word (word mode) or if we're searching
+  -- for the beginning of a new word (whitespace mode).
+  local withinword = false
+  -- A paragraph is a list of UTF-8 encoded strings.
+  local paragraph = {}
+  -- For efficiency, the characters of a word are stored in a list and
+  -- only later concatenated via `table.concat`.
+  local word
+  --Iterate over node list.
+  for n in node.traverse(head) do
+    -- Whitespace mode?
+    if not withinword then
+      -- Search for beginning of a word.
+      if n.id == 37 then
+        withinword = true
+        word = {}
+      end
     end
-    n = node.next(n)
-    i = i + 1
+    -- Word mode?
+    if withinword then
+      -- Store the characters of the current word.
+      if n.id == 37 then
+        table.insert(word, cp2utf8(n.char))
+      end
+      -- Search for the end of the current word.
+      -- This definition of a word fails on '\LaTeX'!
+      if not ((n.id == 37) or (n.id == 7) or (n.id == 22) or (n.id == 11)) then
+        withinword = false
+        -- Convert word from table to string representation.
+        table.insert(paragraph, table.concat(word))
+      end
+    end
   end
-  if llen + 1 + slen > 72 then
-    fd:write(line, '\n')
-    line = s
-    llen = slen
-  else
-    if llen == 0 then
-      line = s
-      llen = slen
+  return paragraph
+end
+
+
+--- Write the words of a paragraph to a file with a fixed line length.
+-- @param f  A file handle.
+-- @param maxlinelength  Maximum line length in output.
+-- @param par  A list of strings.
+write_paragraph = function(f, maxlinelength, par)
+  -- A line is a list of strings.
+  local line = {}
+  -- Set current line length to maximum to trigger a blank line before
+  -- writing the paragraph.
+  local llen = maxlinelength
+  -- Iterate over words in paragraph.
+  for _, word in ipairs(par) do
+    local wlen = unicode.utf8.len(word)
+    -- Does word fit onto current line?
+    if llen + 1 + wlen <= maxlinelength then
+      -- Append word to current line.
+      table.insert(line, ' ')
+      table.insert(line, word)
+      llen = llen + 1 + wlen
     else
-      line = line .. ' ' .. s
-      llen = llen + 1 + slen
+      -- Output current line.
+      f:write(table.concat(line), '\n')
+      -- Store word on new current line.
+      line = { word }
+      llen = wlen
     end
+  end
+  -- If non-empty, output last line of paragraph.
+  if #line > 0 then
+    f:write(table.concat(line), '\n')
   end
 end
 
 
+--- Callback function that writes the words of a node list to a file.
+-- The node list is not manipulated.
+-- @param head  Node list.
+-- @return true
 totext = function(head)
-  local wordstart = nil
-  --Iterate over paragraph.
-  for i in node.traverse(head) do
-    -- Search for beginning of a word.
-    if not wordstart then
-      if i.id == 37 then
-        wordstart = i
-      end
-    end
-    -- Search for end of current word.
-    if wordstart then
-      if not ((i.id == 37) or (i.id == 7) or (i.id == 22) or (i.id == 11)) then
-        output_word(wordstart, i)
-        wordstart = nil
-      end
-    end
-  end
-  if llen > 0 then
-    fd:write(line, '\n\n')
-    line = ''
-    llen = 0
-  end
+  local par = build_paragraph(head)
+  write_paragraph(fd, 72, par)
   return true
 end
 
 
+-- Register callback function.
 luatexbase.add_to_callback("pre_linebreak_filter", totext, "totext")
 luatexbase.add_to_callback("hpack_filter", totext, "totext")
 
