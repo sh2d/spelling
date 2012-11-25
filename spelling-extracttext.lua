@@ -273,7 +273,7 @@ local function __write_text_paragraph(par, f, maxlinelength)
   for i = 2,#par do
     local wlen = utf8len(par[i])
     -- Does word fit onto current line?
-    if llen + 1 + wlen <= maxlinelength then
+    if (llen + 1 + wlen <= maxlinelength) or (maxlinelength < 1) then
       -- Append word to current line.
       llen = llen + 1 + wlen
     else
@@ -351,11 +351,11 @@ M.stop_text_extraction = stop_text_extraction
 -- longer than the specified number of characters, the word is put on
 -- its own line and that line will be overfull.
 --
--- @param cols  New line length in output.  Argument must be at least 1.
+-- @param cols  New line length in output.  If the argument is smaller
+-- than 1, lines aren't wrapped, i.e., all text of a paragraph is put on
+-- a single line.
 local function set_output_line_length(cols)
-  if cols >= 1 then do
-    __opts.output_line_length = cols
-  end
+  __opts.output_line_length = cols
 end
 M.set_output_line_length = set_output_line_length
 
