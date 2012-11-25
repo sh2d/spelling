@@ -1,0 +1,70 @@
+%%% spelling-doc.sty
+%%% Copyright 2012 Stephan Hennig
+%%
+%% This work may be distributed and/or modified under the conditions of
+%% the LaTeX Project Public License, either version 1.3 of this license
+%% or (at your option) any later version.  The latest version of this
+%% license is in http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 2005/12/01 or later.
+%%
+%% See file README for more information.
+%%
+\documentclass[11pt]{article}
+\usepackage{fontspec}
+\defaultfontfeatures{Ligatures=TeX}
+\usepackage{multicol}
+\usepackage[UKenglish]{babel}
+\usepackage[rgb, x11names]{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+  pdftitle={spelling},
+  pdfauthor={Stephan Hennig},
+  pdfkeywords={spell-checking, spelling, TeX, LuaTeX}
+}
+\hypersetup{
+  english,% For \autoref.
+  pdfstartview={XYZ null null null},% Zoom factor is determined by viewer.
+  colorlinks,
+  linkcolor=RoyalBlue3,
+  urlcolor=Chocolate4,
+  citecolor=DeepPink2
+}
+\usepackage{spelling}
+\newcommand*{\pkg}{\textsf{spelling}}
+\newcommand*{\acr}[1]{\mbox{\scshape#1}}
+\begin{document}
+\author{Stephan Hennig\thanks{sh2d@arcor.de}}
+\title{\pkg\thanks{This document describes the \pkg\ package v0.1.}}
+\maketitle
+
+
+\begin{abstract}
+  This package aids spell-checking of \TeX\ documents compiled with the
+  Lua\TeX\ engine.  It can give visual feedback in \acr{pdf} output
+  similar to \acr{wysiwyg} word processors.  The package relies on an
+  external spell-checker application to check spelling of a text file
+  and to output a list of bad spellings.  The package should work with
+  most spell-checkers, even dumb, \TeX-unaware ones.
+
+  \emph{Warning!  This package is in a very early state.  Everything may
+    change!}
+\end{abstract}
+
+
+\begin{multicols}{2}
+\small
+\tableofcontents
+\end{multicols}
+
+
+\end{document}
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-PDF-mode: t
+%%% TeX-master: t
+%%% coding: utf-8
+%%% End: 

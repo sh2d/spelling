@@ -50,6 +50,7 @@ _Happy TeXing!_
     README
     spelling.lua
     spelling.sty
+    spelling-doc.tex
     spelling-recurse.lua
     spelling-stage-1.lua
     spelling-stage-2.lua
