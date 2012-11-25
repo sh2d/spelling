@@ -68,8 +68,8 @@ end
 -- character is returned by means of a meta table.<br />
 --
 -- @class table
--- @name transl_codepoint
-local transl_codepoint = {
+-- @name __transl_codepoint
+local __transl_codepoint = {
 
   [0x0132] = 'IJ',-- LATIN CAPITAL LIGATURE IJ
   [0x0133] = 'ij',-- LATIN SMALL LIGATURE IJ
@@ -91,7 +91,7 @@ local transl_codepoint = {
 
 
 -- Set meta table for code point translation table.
-setmetatable(transl_codepoint,
+setmetatable(__transl_codepoint,
              {
                __index = __meta_cp2utf8,
              }
@@ -128,10 +128,10 @@ setmetatable(transl_codepoint,
 -- </ul>
 --
 -- @class table
--- @name text_document
+-- @name __text_document
 
 -- Create an empty text document.
-local text_document = {}
+local __text_document = {}
 
 
 --- Data structure that stores the words found while scanning a node
@@ -140,10 +140,10 @@ local text_document = {}
 -- single UTF-8 encoded string.
 --
 -- @class table
--- @name curr_paragraph
+-- @name __curr_paragraph
 
 -- Create an empty text paragraph.
-local curr_paragraph = {}
+local __curr_paragraph = {}
 
 
 --- Data structure that stores the characters of a word while scanning a
@@ -155,10 +155,10 @@ local curr_paragraph = {}
 -- inserting the current word into the current paragraph data structure.
 --
 -- @class table
--- @name curr_word
+-- @name __curr_word
 
 -- Create an empty word in table representation.
-local curr_word = {}
+local __curr_word = {}
 
 
 --- Finish current paragraph and start a new one.
@@ -166,16 +166,16 @@ local curr_word = {}
 -- appended to the current paragraph, which in turn, if non-empty, is
 -- appended to the document structure.  After calling this function, the
 -- current word and current paragraph are empty.
-local function start_text_paragraph()
+local function __start_text_paragraph()
   -- Insert non-empty current word into current paragraph.
-  if #curr_word > 0 then
-    tabinsert(curr_paragraph, tabconcat(curr_word))
-    curr_word = {}
+  if #__curr_word > 0 then
+    tabinsert(__curr_paragraph, tabconcat(__curr_word))
+    __curr_word = {}
   end
   -- Insert non-empty current paragraph into document structure.
-  if #curr_paragraph > 0 then
-    tabinsert(text_document, curr_paragraph)
-    curr_paragraph = {}
+  if #__curr_paragraph > 0 then
+    tabinsert(__text_document, __curr_paragraph)
+    __curr_paragraph = {}
   end
 end
 
@@ -185,7 +185,7 @@ end
 -- word.  These words are stored in the current paragraph.
 --
 -- @param head  Node list.
-local function scan_nodelist_for_text(head)
+local function __scan_nodelist_for_text(head)
   for n in node.traverse(head) do
     local nid = n.id
     -- Test for vlist node.
@@ -194,17 +194,17 @@ local function scan_nodelist_for_text(head)
       -- Possible improvement: If the vlist is empty or contains a
       -- single hlist only, don't start a new paragraph.  A bad hack,
       -- but it would help with the \LaTeX logo.
-      start_text_paragraph()
-      scan_nodelist_for_text(n.head)
-      start_text_paragraph()
+      __start_text_paragraph()
+      __scan_nodelist_for_text(n.head)
+      __start_text_paragraph()
     -- Test for hlist node.
     elseif nid == HLIST then
       -- Seamlessly recurse into hlist as if it were non-existent.
-      scan_nodelist_for_text(n.head)
+      __scan_nodelist_for_text(n.head)
     -- Test for glyph node.
     elseif nid == GLYPH then
       -- Append character to current word.
-      tabinsert(curr_word, transl_codepoint[n.char])
+      tabinsert(__curr_word, __transl_codepoint[n.char])
     -- Test for other word component nodes.
     elseif (nid == DISC) or (nid == KERN) or (nid == PUNCT) then
       -- We're still within the current word.  Do nothing.
@@ -212,10 +212,10 @@ local function scan_nodelist_for_text(head)
       -- End of current word detected.  If non-empty, append current
       -- word to current paragraph, converting it from table to string
       -- representation first.
-      if #curr_word > 0 then
-        tabinsert(curr_paragraph, tabconcat(curr_word))
+      if #__curr_word > 0 then
+        tabinsert(__curr_paragraph, tabconcat(__curr_word))
         -- Start new current word.
-        curr_word = {}
+        __curr_word = {}
       end
     end
   end
@@ -226,10 +226,10 @@ end
 --- after.
 --
 -- @param head  Node list.
-local function nodelist_to_text(head)
-  start_text_paragraph()
-  scan_nodelist_for_text(head)
-  start_text_paragraph()
+local function __nodelist_to_text(head)
+  __start_text_paragraph()
+  __scan_nodelist_for_text(head)
+  __start_text_paragraph()
 end
 
 
@@ -239,8 +239,8 @@ end
 --
 -- @param head  Node list.
 -- @return true
-local function cb_plf_pkg_spelling(head)
-  nodelist_to_text(head)
+local function __cb_plf_pkg_spelling(head)
+  __nodelist_to_text(head)
   return true
 end
 
@@ -251,7 +251,7 @@ end
 -- @param par  A text paragraph (an array of words).
 -- @param f  A file handle.
 -- @param maxlinelength  Maximum line length in output.
-local function write_text_paragraph(par, f, maxlinelength)
+local function __write_text_paragraph(par, f, maxlinelength)
   -- Index of first word on current line.  Initialize current line with
   -- first word of paragraph.
   local lstart = 1
@@ -279,15 +279,15 @@ end
 
 
 --- Write all text stored in the document structure to a file.
-local function write_text_document()
+local function __write_text_document()
   -- Open output file.
   local f = assert(io.open(tex.jobname .. '.txt', 'wb'))
   -- Iterate through document paragraphs.
-  for _,par in ipairs(text_document) do
+  for _,par in ipairs(__text_document) do
     -- Separate paragraphs by a blank line.
     f:write('\n')
     -- Write paragraph to file.
-    write_text_paragraph(par, f, 72)
+    __write_text_paragraph(par, f, 72)
     -- Delete paragraph from memory.
     par = nil
   end
@@ -297,8 +297,8 @@ end
 
 
 --- Callback function that writes all document text into a file.
-local function cb_stopr_pkg_spelling()
-  write_text_document()
+local function __cb_stopr_pkg_spelling()
+  __write_text_document()
 end
 
 
@@ -306,10 +306,10 @@ end
 --
 -- Before TeX breaks a paragraph into lines, extract the text of the
 -- paragraph and store it in memory.
-luatexbase.add_to_callback('pre_linebreak_filter', cb_plf_pkg_spelling, 'cb_plf_pkg_spelling')
+luatexbase.add_to_callback('pre_linebreak_filter', __cb_plf_pkg_spelling, '__cb_plf_pkg_spelling')
 --
 -- At the end of the TeX run, output all extracted text.
-luatexbase.add_to_callback('stop_run', cb_stopr_pkg_spelling, 'cb_stopr_pkg_spelling')
+luatexbase.add_to_callback('stop_run', __cb_stopr_pkg_spelling, '__cb_stopr_pkg_spelling')
 
 
 -- Return module table.
