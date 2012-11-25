@@ -126,30 +126,30 @@ setmetatable(__codepoint_map, __meta_codepoint_map)
 
 
 --- Data structure that stores the text of a document.
--- The data structure that is used to store the text of a document is
--- quite simple.  A document is an ordered list (an array) of
--- paragraphs.  A paragraph is an ordered list (an array) of words.  A
--- word is a single UTF-8 encoded string.<br />
+-- The text document data structure stores the text of a document.  The
+-- data structure is quite simple.  A text document is an ordered list
+-- (an array) of paragraphs.  A paragraph is an ordered list (an array)
+-- of words.  A word is a single UTF-8 encoded string.<br />
 --
--- During the TeX run, node lists are scanned for words.  The words
--- found in a node list are stored in the current paragraph.  After
--- finishing scanning a node list, the current paragraph is inserted
--- into this document data structure.  At the end of the TeX run, all
--- paragraphs of the document are broken into lines of a fixed length
--- and the lines are written to a text file.<br />
+-- During the LuaTeX run, node lists are scanned for strings before
+-- hyphenation takes place.  The strings found in a node list are stored
+-- in the current paragraph.  After finishing scanning a node list, the
+-- current paragraph is inserted into the text document.  At the end of
+-- the LuaTeX run, all paragraphs of the text document are broken into
+-- lines of a fixed length and the lines are written to a file.<br />
 --
 -- Here's the rationale of this approach:
 --
 -- <ul>
 --
--- <li> It reduces file access _during_ the TeX run by delaying write
---   operations until the end of the TeX run.
+-- <li> It reduces file access <i>during</i> the LuaTeX run by delaying
+--   write operations until the end.
 --
--- <li> It saves space.  In Lua, strings are internalized.  Since, in a
---   text the same words are used over and over again, relatively few
---   strings are actually stored in memory.
+-- <li> It saves space.  In Lua, strings are internalized.  Since in a
+--   document, the same words are used over and over again, relatively
+--   few strings are actually stored in memory.
 --
--- <li> It allows for pre-processing the document text before writing it
+-- <li> It allows for pre-processing the text document before writing it
 --   to a file.
 --
 -- </ul>
@@ -161,23 +161,19 @@ setmetatable(__codepoint_map, __meta_codepoint_map)
 local __text_document = {}
 
 
---- Data structure that stores the words found while scanning a node
---- list corresponding to a paragraph.
--- A paragraph is an ordered list (an array) of words.  A word is a
--- single UTF-8 encoded string.
+--- Data structure that stores the word strings found in a node list.
 --
 -- @class table
 -- @name __curr_paragraph
 local __curr_paragraph
 
 
---- Data structure that stores the characters of a word while scanning a
---- node list corresponding to a paragraph.
--- The current word data structure is not a plain string, but an ordered
--- list (an array) of the characters of a word.  The characters are
--- collected while scanning a node list.  They are concatenated to a
--- single string only after the end of a word is detected, before
--- inserting the current word into the current paragraph data structure.
+--- Data structure that stores the characters of a word string.
+-- The current word data structure is an ordered list (an array) of the
+-- characters of the word.  The characters are collected while scanning
+-- a node list.  They are concatenated to a single string only after the
+-- end of a word is detected, before inserting the current word into the
+-- current paragraph data structure.
 --
 -- @class table
 -- @name __curr_word
