@@ -59,6 +59,18 @@
     pkg_spelling_stage[2].set_highlight_color('\luaescapestring{#1}')
   }%
 }
+% Provide command for enabling/disabling text ouput.
+\newcommand*{\spellingoutput}[1]{%
+  \ifthenelse{\equal{#1}{on}}{%
+    \directlua{
+      pkg_spelling_stage[4].enable_text_output()
+    }%
+  }{%
+    \directlua{
+      pkg_spelling_stage[4].disable_text_output()
+    }%
+  }%
+}
 % Try to read a list of bad spellings from file `\jobname.spb'.
 \IfFileExists{\jobname.spb}{%
   \spellingreadbad{\jobname.spb}%
@@ -71,3 +83,5 @@
 }
 % Enable visual feedback.
 \spellinghighlight{on}
+% Enable text ouput at the end of the LuaTeX run.
+\spellingoutput{on}
