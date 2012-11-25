@@ -31,16 +31,19 @@ fd = io.open(tex.jobname .. '.txt','wb')
 -- @param cp  A Unicode code point.
 -- @return  A string representing a UTF-8 encoded character.
 cp2utf8 = function(cp)
+  -- range U-00000000 – U-0000007F:  0xxxxxxx
   if cp < 0x80 then
     local one = cp
     return string.char(one)
   end
+  -- range U-00000080 – U-000007FF:  110xxxxx 10xxxxxx
   if cp < 0x0800 then
     local two = cp % 64
     cp = math.floor(cp / 64)
     local one = cp
     return string.char(128 + 64 + one) .. string.char(128 + two)
   end
+  -- range U-00000800 – U-0000FFFF:  1110xxxx 10xxxxxx 10xxxxxx
   if cp < 0x00010000 then
     local three = cp % 64
     cp = math.floor(cp / 64)
@@ -49,6 +52,7 @@ cp2utf8 = function(cp)
     local one = cp
     return string.char(128 + 64 + 32 + one) .. string.char(128 + two) .. string.char(128 + three)
   end
+  -- range U-00010000 – U-001FFFFF:  11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
   if cp < 0x00200000 then
     local four = cp % 64
     cp = math.floor(cp / 64)
@@ -59,7 +63,32 @@ cp2utf8 = function(cp)
     local one = cp
     return string.char(128 + 64 + 32 + 16 + one) .. string.char(128 + two) .. string.char(128 + three) .. string.char(128 + four)
   end
-  return '???'
+  -- range U-00200000 – U-03FFFFFF:  111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+  if cp < 0x04000000 then
+    local five = cp % 64
+    cp = math.floor(cp / 64)
+    local four = cp % 64
+    cp = math.floor(cp / 64)
+    local three = cp % 64
+    cp = math.floor(cp / 64)
+    local two = cp % 64
+    cp = math.floor(cp / 64)
+    local one = cp
+    return string.char(128 + 64 + 32 + 16 + 8 + one) .. string.char(128 + two) .. string.char(128 + three) .. string.char(128 + four) .. string.char(128 + five)
+  end
+  -- range U-04000000 – U-7FFFFFFF:  1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+  local six = cp % 64
+  cp = math.floor(cp / 64)
+  local five = cp % 64
+  cp = math.floor(cp / 64)
+  local four = cp % 64
+  cp = math.floor(cp / 64)
+  local three = cp % 64
+  cp = math.floor(cp / 64)
+  local two = cp % 64
+  cp = math.floor(cp / 64)
+  local one = cp
+  return string.char(128 + 64 + 32 + 16 + 8 + 4 + one) .. string.char(128 + two) .. string.char(128 + three) .. string.char(128 + four) .. string.char(128 + five) .. string.char(128 + six)
 end
 
 
