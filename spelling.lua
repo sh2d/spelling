@@ -15,6 +15,12 @@
 fd = io.open(tex.jobname .. '.txt','wb')
 
 
+-- Function short-cuts.
+local tabconcat = table.concat
+local tabinsert = table.insert
+local utf8len = unicode.utf8.len
+
+
 --- Convert Unicode code points to UTF-8.
 -- This function converts Unicode code points to UTF-8 characters.  It
 -- is modelled after the following table taken from the UTF-8 and
@@ -120,14 +126,14 @@ build_paragraph = function(head)
     if withinword then
       -- Store the characters of the current word.
       if n.id == 37 then
-        table.insert(word, cp2utf8(n.char))
+        tabinsert(word, cp2utf8(n.char))
       end
       -- Search for the end of the current word.
       -- This definition of a word fails on '\LaTeX'!
       if not ((n.id == 37) or (n.id == 7) or (n.id == 22) or (n.id == 11)) then
         withinword = false
         -- Convert word from table to string representation.
-        table.insert(paragraph, table.concat(word))
+        tabinsert(paragraph, tabconcat(word))
       end
     end
   end
@@ -147,16 +153,16 @@ write_paragraph = function(f, maxlinelength, par)
   local llen = maxlinelength
   -- Iterate over words in paragraph.
   for _, word in ipairs(par) do
-    local wlen = unicode.utf8.len(word)
+    local wlen = utf8len(word)
     -- Does word fit onto current line?
     if llen + 1 + wlen <= maxlinelength then
       -- Append word to current line.
-      table.insert(line, ' ')
-      table.insert(line, word)
+      tabinsert(line, ' ')
+      tabinsert(line, word)
       llen = llen + 1 + wlen
     else
       -- Output current line.
-      f:write(table.concat(line), '\n')
+      f:write(tabconcat(line), '\n')
       -- Store word on new current line.
       line = { word }
       llen = wlen
@@ -164,7 +170,7 @@ write_paragraph = function(f, maxlinelength, par)
   end
   -- If non-empty, output last line of paragraph.
   if #line > 0 then
-    f:write(table.concat(line), '\n')
+    f:write(tabconcat(line), '\n')
   end
 end
 
