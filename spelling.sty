@@ -71,6 +71,12 @@
     }%
   }%
 }
+% Provide command for setting text output file name.
+\newcommand*{\spellingoutputname}[1]{%
+  \directlua{
+    pkg_spelling_stage[4].set_output_file_name('\luaescapestring{#1}')
+  }%
+}
 % Try to read a list of bad spellings from file `\jobname.spb'.
 \IfFileExists{\jobname.spb}{%
   \spellingreadbad{\jobname.spb}%
