@@ -284,13 +284,12 @@ local function __nodelist_to_text(head)
 end
 
 
---- Callback function that scans a node list for text and stores that in
---- the document structure.
+--- Call-back function that processes the node list.
 -- The node list is not manipulated.
 --
 -- @param head  Node list.
 -- @return true
-local function __cb_plf_pkg_spelling(head)
+local function __cb_pre_linebreak_filter_pkg_spelling(head)
   __nodelist_to_text(head)
   return true
 end
@@ -305,9 +304,9 @@ local __is_active_storage
 -- document.
 local function enable_text_storage()
   if not __is_active_storage then
-    -- Register callback: Before TeX breaks a paragraph into lines,
+    -- Register call-back: Before LuaTeX breaks a paragraph into lines,
     -- extract the text of the paragraph and store it in memory.
-    luatexbase.add_to_callback('pre_linebreak_filter', __cb_plf_pkg_spelling, '__cb_plf_pkg_spelling')
+    luatexbase.add_to_callback('pre_linebreak_filter', __cb_pre_linebreak_filter_pkg_spelling, '__cb_pre_linebreak_filter_pkg_spelling')
     __is_active_storage = true
   end
 end
@@ -320,7 +319,7 @@ M.enable_text_storage = enable_text_storage
 local function disable_text_storage()
   if __is_active_storage then
     -- Un-register callback.
-    luatexbase.remove_from_callback('pre_linebreak_filter', '__cb_plf_pkg_spelling')
+    luatexbase.remove_from_callback('pre_linebreak_filter', '__cb_pre_linebreak_filter_pkg_spelling')
     __is_active_storage = false
   end
 end

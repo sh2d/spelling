@@ -174,9 +174,9 @@ local __is_active_output
 -- document at the end of the LuaTeX run.
 local function enable_text_output()
   if not __is_active_output then
-    -- Register call-back: at the end of the TeX run, output all text
+    -- Register call-back: At the end of the LuaTeX run, output all text
     -- stored in the text document.
-    luatexbase.add_to_callback('stop_run', __write_text_document, '__cb_stopr_pkg_spelling')
+    luatexbase.add_to_callback('stop_run', __write_text_document, '__cb_stop_run_pkg_spelling')
     __is_active_output = true
   end
 end
@@ -188,7 +188,7 @@ M.enable_text_output = enable_text_output
 local function disable_text_output()
   if __is_active_output then
     -- De-register call-back.
-    luatexbase.remove_from_callback('stop_run', '__cb_stopr_pkg_spelling')
+    luatexbase.remove_from_callback('stop_run', '__cb_stop_run_pkg_spelling')
     __is_active_output = false
   end
 end
