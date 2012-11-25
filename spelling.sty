@@ -20,6 +20,7 @@
 \PackageError{spelling}{LuaTeX engine required}{You could try with the
   `lualatex' command.}
 \fi
+\RequirePackage{ifthen}
 \RequirePackage{luatexbase}
 \directlua name {spelling}{dofile('spelling.lua')}
 % Words are extracted after pages have been built.  In lack of a proper
@@ -40,6 +41,18 @@
     pkg_spelling_stage[1].read_good_strings('\luaescapestring{#1}')
   }%
 }
+% Provide command for enabling/disabling visual feedback.
+\newcommand*{\spellinghighlight}[1]{%
+  \ifthenelse{\equal{#1}{on}}{%
+    \directlua{
+      pkg_spelling_stage[2].enable_word_highlighting()
+    }%
+  }{%
+    \directlua{
+      pkg_spelling_stage[2].disable_word_highlighting()
+    }%
+  }%
+}
 % Try to read a list of bad spellings from file `\jobname.spb'.
 \IfFileExists{\jobname.spb}{%
   \spellingreadbad{\jobname.spb}%
@@ -50,3 +63,5 @@
   \spellingreadgood{\jobname.spg}%
 }{%
 }
+% Enable visual feedback.
+\spellinghighlight{on}
