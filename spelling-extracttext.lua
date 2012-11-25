@@ -111,12 +111,18 @@ local __codepoint_map = {
 }
 
 
+--- Meta table for code point mapping table.
+--
+-- @class table
+-- @name __meta_codepoint_map
+-- @field __index  Index operator.
+local __meta_codepoint_map = {
+   __index = __meta_cp2utf8,
+}
+
+
 -- Set meta table for code point mapping table.
-setmetatable(__codepoint_map,
-             {
-               __index = __meta_cp2utf8,
-             }
-)
+setmetatable(__codepoint_map, __meta_codepoint_map)
 
 
 --- Data structure that stores the text of a document.
@@ -395,11 +401,7 @@ M.set_output_line_length = set_output_line_length
 -- and no code point mapping takes place during text extraction.
 local function clear_all_mappings()
   __codepoint_map = {}
-  setmetatable(__codepoint_map,
-               {
-                 __index = __meta_cp2utf8,
-               }
-  )
+  setmetatable(__codepoint_map, __meta_codepoint_map)
 end
 M.clear_all_mappings = clear_all_mappings
 
