@@ -14,9 +14,20 @@
 \usepackage{fontspec}
 \defaultfontfeatures{Ligatures=TeX}
 \usepackage{multicol}
-\usepackage{shortvrb}
-\MakeShortVerb{\|}
-\usepackage[UKenglish]{babel}
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily,
+  columns=spaceflexible,
+}
+% Short-cut for non-language code snippets.
+\lstMakeShortInline\|
+% Short-cut for LaTeX code snippets.
+\lstMakeShortInline[
+language={[LaTeX]TeX},
+basicstyle=\ttfamily,
+]°
+\usepackage{xspace}
+\usepackage[latin, UKenglish]{babel}
 \usepackage[rgb, x11names]{xcolor}
 \usepackage{hyperref}
 \hypersetup{
@@ -35,6 +46,9 @@
 \usepackage{spelling}
 \newcommand*{\pkg}{\textsf{spelling}}
 \newcommand*{\acr}[1]{\mbox{\scshape#1}}
+\newcommand*{\descr}[1]{〈\emph{#1}〉}
+\newcommand*{\latinphrase}[1]{\foreignlanguage{latin}{\emph{#1}}}
+\newcommand*{\lpeg}{\latinphrase{e.\,g.}\xspace}
 \begin{document}
 \author{Stephan Hennig\thanks{sh2d@arcor.de}}
 \title{\pkg\thanks{This document describes the \pkg\ package v0.1.}}
@@ -98,6 +112,68 @@ package follows the third approach, providing some unique features:
 
 \end{itemize}
 
+
+\section{Usage}
+\label{sec:usage}
+
+The \pkg\ package requires the Lua\TeX\ engine.  Currently, only the
+\LaTeX\ format is supported.  \emph{The package consists of Lua modules
+  that do the actual work.  The \LaTeX\ package is effectively a wrapper
+  around the modules' Lua-API.  Implementing support for other formats
+  shouldn't be too difficult.  Since the author is a \LaTeX-only user,
+  support has to be contributed by, \lpeg, you.  By the way, the \LaTeX\
+  package needs some polishing, too.  Contributions are welcome!}
+
+
+\subsection{Work-flow}
+\label{sec:work-flow}
+
+The work-flow of the \pkg\ package is as follows:
+
+\begin{enumerate}
+
+\item After the package is loaded in the preamble of a |.tex| source
+  file via °\usepackage{spelling}°, a list of bad spellings is read from
+  a file named \descr{jobname}|.spb|, if that file exists.
+
+\item During the Lua\TeX\ run, text is extracted from pages and all
+  words are checked against the list of bad spellings.  Words with a
+  known incorrect spelling are highlighted in \acr{pdf} output.
+
+\item At the end of the Lua\TeX\ run, in addition to the \acr{pdf} file,
+  a text file is written, named \descr{jobname}|.txt|, by default.  The
+  text file should contain most of the text of the original document.
+
+\item The text file is then checked by your favourite spell-checker
+  application, \lpeg, Aspell or Hunspell.  The spell-checker should be
+  able to write a list of bad spellings to a file.  Otherwise, visual
+  feedback in \acr{pdf} output won't work.  The file should preferably
+  be named \descr{jobname}|.spb|, but any other file name works just as
+  well.
+
+\item Now, there are two ways to proceed:
+
+  \begin{enumerate}
+
+  \item Visually minded people may just compile their document a second
+    time.  This time, file \descr{jobname}|.spb| is read-in again and
+    the words with incorrect spelling found by the spell-checker should
+    now be highlighted in \acr{pdf} output.  Checking the \acr{pdf}
+    file, the necessary corrections to the |.tex| source file can be
+    applied.
+
+  \item If you're not interested in visual feedback or if your
+    spell-checker doesn't provide a non-interactive mode, you can as
+    well apply the necessary corrections directly to the |.tex| source
+    file(s), either interactively, during the spell-checker run, or by
+    looking at the final list of bad spellings in an editor (whatever
+    file it was saved to).  That way, the benefit of this package is,
+    that spell-checker input has already been processed by Lua\TeX, but
+    contains no hyphenated words.
+
+  \end{enumerate}
+
+\end{enumerate}
 
 
 \end{document}
