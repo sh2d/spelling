@@ -29,6 +29,43 @@ local KERN = node.id('kern')
 local PUNCT = node.id('punct')
 
 
+-- With this table it is possible to translate Unicode code points to
+-- arbitrary strings.  As an example, the single Unicode code point
+-- U-fb00 (LATIN SMALL LIGATURE FF) can be resolved into the multi
+-- character string 'ff' instead of being converted to the single
+-- character string 'ﬀ'.  The resulting string must be in the UTF-8
+-- encoding.
+local transl_codepoint = {
+
+  [0x0132] = 'IJ',-- LATIN CAPITAL LIGATURE IJ
+  [0x0133] = 'ij',-- LATIN SMALL LIGATURE IJ
+  [0x0152] = 'OE',-- LATIN CAPITAL LIGATURE OE
+  [0x0153] = 'oe',-- LATIN SMALL LIGATURE OE
+  [0x017f] = 's',-- LATIN SMALL LETTER LONG S
+
+  [0x1e9e] = 'SS',-- LATIN CAPITAL LETTER SHARP S
+
+  [0xfb00] = 'ff',-- LATIN SMALL LIGATURE FF
+  [0xfb01] = 'fi',-- LATIN SMALL LIGATURE FI
+  [0xfb02] = 'fl',-- LATIN SMALL LIGATURE FL
+  [0xfb03] = 'ffi',-- LATIN SMALL LIGATURE FFI
+  [0xfb04] = 'ffl',-- LATIN SMALL LIGATURE FFL
+  [0xfb05] = 'st',-- LATIN SMALL LIGATURE LONG S T
+  [0xfb06] = 'st',-- LATIN SMALL LIGATURE ST
+
+  -- Meta table for ourselves.
+  mt = {
+     --- Retrieve regular UTF-8 character as a fall-back.
+     __index = function(t, cp)
+                  return utf8char(cp)
+               end
+  }
+
+}
+-- Set meta table for code point translation table.
+setmetatable(transl_codepoint, transl_codepoint.mt)
+
+
 --- Scan a node list for words.
 -- The given node list is scanned for chaines of nodes representing a
 -- word.  These words are stored as a list of UTF-8 encoded strings.
@@ -57,7 +94,7 @@ build_paragraph = function(head)
     if withinword then
       -- Store the characters of the current word.
       if n.id == GLYPH then
-        tabinsert(word, utf8char(n.char))
+        tabinsert(word, transl_codepoint[n.char])
       end
       -- Search for the end of the current word.
       -- This definition of a word fails on '\LaTeX'!
