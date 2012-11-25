@@ -46,9 +46,10 @@ _Happy TeXing!_
 
     LICENSE
     README
-    spelling-extracttext.lua
     spelling.lua
     spelling.sty
+    spelling-stage-3.lua
+    spelling-stage-4.lua
 
 
 
