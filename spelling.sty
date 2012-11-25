@@ -89,6 +89,18 @@
     pkg_spelling_stage[4].set_output_eol('\luaescapestring{#1}')
   }%
 }
+% Provide command for enabling/disabling text extraction.
+\newcommand*{\spellingextract}[1]{%
+  \ifthenelse{\equal{#1}{on}}{%
+    \directlua{
+      pkg_spelling_stage[2].enable_text_tagging()
+    }%
+  }{%
+    \directlua{
+      pkg_spelling_stage[2].disable_text_tagging()
+    }%
+  }%
+}
 % Try to read a list of bad spellings from file `\jobname.spb'.
 \IfFileExists{\jobname.spb}{%
   \spellingreadbad{\jobname.spb}%
@@ -103,3 +115,5 @@
 \spellinghighlight{on}
 % Enable text ouput at the end of the LuaTeX run.
 \spellingoutput{on}
+% Enable text extraction.
+\spellingextract{on}

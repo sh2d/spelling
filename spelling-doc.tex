@@ -322,6 +322,23 @@ determined by Lua\TeX.  If |os.type| is either |windows| or |msdos|,
 ending convention is used.
 
 
+\subsection{Text extraction}
+\label{sec:textextraction}
+
+\paragraph{Enabling/disabling} Text extraction can be enabled and
+disabled in the document via command \macro{spellingextract}.  If the
+argument is |on|, text extraction is enabled.  For other arguments, text
+extraction is disabled.  The command should be used in vertical mode,
+\lpie, outside paragraphs.  If text extraction is disabled in the
+document preamble, an empty text file is written at the end of the
+Lua\TeX\ run.  Text extraction is enabled, by default.
+
+Note, text extraction and visual feedback are orthogonal features.  That
+is, if text extraction is disabled for part of a document, \lpeg, a long
+table, words with a known incorrect spelling are still highlighted in
+that part.
+
+
 \end{document}
 
 
