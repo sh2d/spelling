@@ -14,6 +14,8 @@
 \usepackage{fontspec}
 \defaultfontfeatures{Ligatures=TeX}
 \usepackage{multicol}
+\usepackage{shortvrb}
+\MakeShortVerb{\|}
 \usepackage[UKenglish]{babel}
 \usepackage[rgb, x11names]{xcolor}
 \usepackage{hyperref}
@@ -56,6 +58,46 @@
 \small
 \tableofcontents
 \end{multicols}
+
+
+\section{Introduction}
+\label{sec:intro}
+
+There are three main approaches to spell-checking \TeX\ documents:
+
+\begin{enumerate}
+
+\item checking spelling in the |.tex| source file,
+
+\item converting a |.tex| file to another format, for which a proved
+  spell-checking solution exists,
+
+\item checking spelling after a |.tex| file has been processed by \TeX.
+
+\end{enumerate}
+
+All of these approaches have their strengths and weaknesses.  This
+package follows the third approach, providing some unique features:
+
+\begin{itemize}
+
+\item When extracting text from typeset \acr{dvi}, \acr{ps} or \acr{pdf}
+  files, hyphenation has to be switched off during the \TeX\ run to
+  avoid lots of false positives being reported by the spell-checker.
+  That is, one doesn't work on the original document.
+
+  In contrast to that, the \pkg\ package works transparently on the
+  original |.tex| source file.  Text is extracted \emph{during}
+  typesetting, after Lua\TeX\ has applied its catcode and macro
+  machinery, but before hyphenation takes place.
+
+\item The \pkg\ package can highlight words with known incorrect
+  spelling in \acr{pdf} output, giving visual feedback similar to
+  \acr{wysiwyg} word processors.%
+  \footnote{Currently, only colouring words is implemented.}
+
+\end{itemize}
+
 
 
 \end{document}
