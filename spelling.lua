@@ -69,43 +69,37 @@ setmetatable(transl_codepoint, transl_codepoint.mt)
 --- Scan a node list for words.
 -- The given node list is scanned for chaines of nodes representing a
 -- word.  These words are stored as a list of UTF-8 encoded strings.
+--
 -- @param head  Node list.
 -- @return A list of UTF-8 encoded strings.
-build_paragraph = function(head)
-  -- Flag, if we're processing a word (word mode) or if we're searching
-  -- for the beginning of a new word (whitespace mode).
-  local withinword = false
+local function build_text_paragraph(head)
   -- A paragraph is a list of UTF-8 encoded strings.
-  local paragraph = {}
+  local curr_paragraph = {}
   -- For efficiency, the characters of a word are stored in a list and
   -- only later concatenated via `table.concat`.
-  local word
+  local curr_word = {}
   --Iterate over node list.
   for n in node.traverse(head) do
-    -- Whitespace mode?
-    if not withinword then
-      -- Search for beginning of a word.
-      if n.id == GLYPH then
-        withinword = true
-        word = {}
-      end
-    end
-    -- Word mode?
-    if withinword then
-      -- Store the characters of the current word.
-      if n.id == GLYPH then
-        tabinsert(word, transl_codepoint[n.char])
-      end
-      -- Search for the end of the current word.
-      -- This definition of a word fails on '\LaTeX'!
-      if not ((n.id == GLYPH) or (n.id == DISC) or (n.id == KERN) or (n.id == PUNCT)) then
-        withinword = false
-        -- Convert word from table to string representation.
-        tabinsert(paragraph, tabconcat(word))
+    local nid = n.id
+    -- Test for glyph node.
+    if nid == GLYPH then
+      -- Append character to current word.
+      tabinsert(curr_word, transl_codepoint[n.char])
+    -- Test for other word component nodes.
+    elseif (nid == DISC) or (nid == KERN) or (nid == PUNCT) then
+      -- Do nothing.
+    else
+      -- End of current word detected.  If non-empty, append current
+      -- word to current paragraph, converting it from table to string
+      -- representation first.
+      if #curr_word > 0 then
+        tabinsert(curr_paragraph, tabconcat(curr_word))
+        -- Start new current word.
+        curr_word = {}
       end
     end
   end
-  return paragraph
+  return curr_paragraph
 end
 
 
@@ -148,7 +142,7 @@ end
 -- @param head  Node list.
 -- @return true
 totext = function(head)
-  local par = build_paragraph(head)
+  local par = build_text_paragraph(head)
   write_paragraph(fd, 72, par)
   return true
 end
