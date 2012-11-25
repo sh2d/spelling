@@ -21,6 +21,7 @@
 -- <dt>Stage 1</dt>
 --   <dd><ul>
 --     <li>Load list(s) of bad strings.</li>
+--     <li>Load list(s) of good strings.</li>
 --   </ul></dd>
 --
 -- <dt>Stage 2  (call-back <code>pre_linebreak_filter</code>)</dt>
@@ -88,6 +89,11 @@ pkg_spelling_stage = {
 -- This table maps all strings known as bad spellings to the value
 -- `true`.
 --
+-- @field is_good  Table.<br />
+--
+-- This table maps all strings known as good spellings to the value
+-- `true`.
+--
 -- @field text_document  Table.<br />
 --
 -- Data structure that stores the text of a document.  The text document
@@ -128,6 +134,7 @@ pkg_spelling_stage = {
 local res = {
 
   is_bad,
+  is_good,
   text_document,
   whatsit_uid,
 
@@ -139,6 +146,7 @@ local res = {
 local function __init()
   -- Create resources.
   res.is_bad = {}
+  res.is_good = {}
   res.text_document = {}
   res.whatsit_uid = 163
   -- Make resources available to modules.

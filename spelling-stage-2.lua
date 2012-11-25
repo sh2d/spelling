@@ -64,6 +64,9 @@ local PDF_COLORSTACK = node.subtype('pdf_colorstack')
 -- Table of known bad spellings.
 local __is_bad
 --
+-- Table of known good spellings.
+local __is_good
+--
 -- ID of user-defined whatsit nodes.
 local __whatsit_uid
 
@@ -75,6 +78,7 @@ local __whatsit_uid
 -- @param res  Ressource table.
 local function set_resources(res)
   __is_bad = res.is_bad
+  __is_good = res.is_good
   __whatsit_uid = res.whatsit_uid
 end
 M.set_resources = set_resources
@@ -342,7 +346,7 @@ local function __finish_current_word()
     -- Tag node list with word string.
     __tag_word(word)
     -- Test for bad spelling.
-    if __is_active_highlighting and __is_bad[word] then
+    if __is_active_highlighting and __is_bad[word] and not __is_good[word] then
       __highlight_bad_word()
     end
     __curr_word = nil
