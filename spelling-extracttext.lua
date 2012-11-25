@@ -46,6 +46,18 @@ local VLIST = node.id('vlist')
 local WHATSIT = node.id('whatsit')
 
 
+--- Module options.
+-- This table contains all module options.  User functions to set
+-- options are provided.
+--
+-- @class table
+-- @name __opts
+-- @field output_line_length  Line length in output.
+local __opts = {
+  output_line_lenght,
+}
+
+
 --- Convert a Unicode code point to a regular UTF-8 encoded string.
 -- This function can be used as an `__index` meta method.
 --
@@ -287,7 +299,7 @@ local function __write_text_document()
     -- Separate paragraphs by a blank line.
     f:write('\n')
     -- Write paragraph to file.
-    __write_text_paragraph(par, f, 72)
+    __write_text_paragraph(par, f, __opts.output_line_length)
     -- Delete paragraph from memory.
     par = nil
   end
@@ -332,6 +344,25 @@ end
 M.stop_text_extraction = stop_text_extraction
 
 
+--- Set output line length.
+-- Set the number of columns in text output.  Text output will be
+-- wrapped at spaces so that lines don't contain more than the specified
+-- number of characters per line.  There's one exception: if a word is
+-- longer than the specified number of characters, the word is put on
+-- its own line and that line will be overfull.
+--
+-- @param cols  New line length in output.  Argument must be at least 1.
+local function set_output_line_length(cols)
+  if cols >= 1 then do
+    __opts.output_line_length = cols
+  end
+end
+M.set_output_line_length = set_output_line_length
+
+
+--- Module initialisation.
+-- Set default output line length.
+set_output_line_length(72)
 -- At the end of the TeX run, output all extracted text.
 luatexbase.add_to_callback('stop_run', __cb_stopr_pkg_spelling, '__cb_stopr_pkg_spelling')
 
