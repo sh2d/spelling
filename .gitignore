@@ -1,0 +1,8 @@
+API/
+auto/
+*~
+*.aux
+*.html
+*.log
+*.pdf
+*.txt
