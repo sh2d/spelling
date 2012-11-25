@@ -253,8 +253,31 @@ local __curr_word
 local function __finish_current_word()
   -- Finish a word?
   if __curr_word then
+    local word = tabconcat(__curr_word)
+    -- Check, if the current word has already been tagged.  This is only
+    -- a quick hack.
+    local start_prev = __curr_word_start.prev
+    local end_next = __curr_word_end.next
+    if start_prev and end_next
+    and (start_prev.id == WHATSIT)
+    and (start_prev.subtype == USER_DEFINED)
+    and (start_prev.user_id == __whatsit_uid)
+    and (start_prev.type == 115)
+    and (start_prev.value == '')
+    and (end_next.id == WHATSIT)
+    and (end_next.subtype == USER_DEFINED)
+    and (end_next.user_id == __whatsit_uid)
+    and (end_next.type == 115)
+    and (end_next.value == word) then
+      __curr_word = nil
+      __curr_word_start_head = nil
+      __curr_word_start = nil
+      __curr_word_end_head = nil
+      __curr_word_end = nil
+      return
+    end
     -- Tag node list with word string.
-    __tag_word(tabconcat(__curr_word))
+    __tag_word(word)
     __curr_word = nil
   end
   __curr_word_start_head = nil
