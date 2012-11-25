@@ -73,25 +73,24 @@ local function __meta_cp2utf8(t, cp)
 end
 
 
---- Table of Unicode code point translation relations.
--- A code point translation relation is a mapping of a Unicode code
--- point to an arbitrary UTF-8 encoded string.  Translation relations
--- are used during text extraction to translate certain Unicode code
--- points to an arbitrary string instead of the UTF-8 encoded character
--- corresponding to the code point.<br />
+--- Table of Unicode code point mappings.
+-- This table maps Unicode code point to strings.  The mappings are used
+-- during text extraction to translate certain Unicode code points to an
+-- arbitrary string instead of the corresponding UTF-8 encoded
+-- character.<br />
 --
--- As an example, the single Unicode code point U-fb00 (LATIN SMALL
--- LIGATURE FF) can be resolved into the multi character string 'ff'
--- instead of being converted to the single character string 'ﬀ'
--- ('&#xfb00;').<br />
+-- As an example, by adding an appropriate entry to this table, the
+-- single Unicode code point U-fb00 (LATIN SMALL LIGATURE FF) can be
+-- resolved into the multi character string 'ff' instead of being
+-- converted to the single character string 'ﬀ' ('&#xfb00;').<br />
 --
 -- Keys are Unicode code points.  Values must be strings in the UTF-8
 -- encoding.  If a key is not present in this table, the regular UTF-8
 -- character is returned by means of a meta table.<br />
 --
 -- @class table
--- @name __transl_codepoint
-local __transl_codepoint = {
+-- @name __codepoint_map
+local __codepoint_map = {
 
   [0x0132] = 'IJ',-- LATIN CAPITAL LIGATURE IJ
   [0x0133] = 'ij',-- LATIN SMALL LIGATURE IJ
@@ -112,8 +111,8 @@ local __transl_codepoint = {
 }
 
 
--- Set meta table for code point translation table.
-setmetatable(__transl_codepoint,
+-- Set meta table for code point mapping table.
+setmetatable(__codepoint_map,
              {
                __index = __meta_cp2utf8,
              }
@@ -226,7 +225,7 @@ local function __scan_nodelist_for_text(head)
     -- Test for glyph node.
     elseif nid == GLYPH then
       -- Append character to current word.
-      tabinsert(__curr_word, __transl_codepoint[n.char])
+      tabinsert(__curr_word, __codepoint_map[n.char])
     -- Test for other word component nodes.
     elseif (nid == DISC) or (nid == KERN) or (nid == PUNCT) then
       -- We're still within the current word.  Do nothing.
@@ -391,58 +390,58 @@ end
 M.set_output_line_length = set_output_line_length
 
 
---- Clear all code point translation relations.
--- After calling this function, there are no known code point
--- translation relations and no code point translation takes place
--- during text extraction.
-local function clear_all_translations()
-  __transl_codepoint = {}
-  setmetatable(__transl_codepoint,
+--- Clear all code point mappings.
+-- After calling this function, there are no known code point mappings
+-- and no code point mapping takes place during text extraction.
+local function clear_all_mappings()
+  __codepoint_map = {}
+  setmetatable(__codepoint_map,
                {
                  __index = __meta_cp2utf8,
                }
   )
 end
-M.clear_all_translations = clear_all_translations
+M.clear_all_mappings = clear_all_mappings
 
 
---- Manage Unicode code point translation relations.
--- This function can be used to set-up code point translation relations.
--- First argument must be a number, second argument must be a string in
--- the UTF-8 encoding or `nil`.<br />
+--- Manage Unicode code point mappings.
+-- This function can be used to set-up code point mappings.  First
+-- argument must be a number, second argument must be a string in the
+-- UTF-8 encoding or `nil`.<br />
 --
 -- If the second argument is a string, after calling this function, the
 -- Unicode code point given as first argument, when found in a node list
--- during text extraction, is translated into the string given as second
--- argument instead of into a UTF-8 encoded character corresponding to
--- the code point.<br />
+-- during text extraction, is mapped to the string given as second
+-- argument instead of being converted to a UTF-8 encoded character
+-- corresponding to the code point.<br />
 --
--- If the second argument is `nil`, after calling this function, any
--- translation relation for the given code point is non-existent.
+-- If the second argument is `nil`, a mapping for the given code point,
+-- if existing, is deleted.
 --
 -- @param cp A Unicode code point, e.g., 0xfb00 for the code point LATIN
 -- SMALL LIGATURE FF.
--- @param newt  New translation string or `nil`.
--- @return Old translation string in the code point translation relation
--- (possibly `nil`).  If any arguments are invalid (code point not of
--- type `number` or not in the range 0 to 0x10ffff or translation string
--- argument neither of type `string` nor `nil`), return value is
--- `false`.
-local function set_translation(cp, newt)
-  -- Prevent from invalid entries in translation table.
+-- @param newt  New target string to map the code point to or `nil`.
+-- @return Old target string the code point was mapped to before
+-- (possibly `nil`).  If any arguments are invalid, return value is
+-- `false`.  Arguments are invalid if code point is not of type `number`
+-- or not in the range 0 to 0x10ffff or if new target string is neither
+-- of type `string` nor `nil`).
+local function set_mapping(cp, newt)
+  -- Prevent from invalid entries in mapping table.
   if (type(cp) ~= 'number') or
      (cp < 0) or
      (cp > 0x10ffff) or
      ((type(newt) ~= 'string') and (type(newt) ~= 'nil')) then
     return false
   end
-  -- Retrieve old translation string.
-  local oldt = rawget(__transl_codepoint, cp)
-  -- Set new translation relation.
-  __transl_codepoint[cp] = newt
+  -- Retrieve old mapping.
+  local oldt = rawget(__codepoint_map, cp)
+  -- Set new mapping.
+  __codepoint_map[cp] = newt
+  -- Return old mapping.
   return oldt
 end
-M.set_translation = set_translation
+M.set_mapping = set_mapping
 
 
 --- Module initialisation.
