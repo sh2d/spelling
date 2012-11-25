@@ -73,7 +73,13 @@ local function __meta_cp2utf8(t, cp)
 end
 
 
---- Table to translate Unicode code points into arbitrary strings.
+--- Table of Unicode code point translation relations.
+-- A code point translation relation is a mapping of a Unicode code
+-- point to an arbitrary UTF-8 encoded string.  Translation relations
+-- are used during text extraction to translate certain Unicode code
+-- points to an arbitrary string instead of the UTF-8 encoded character
+-- corresponding to the code point.<br />
+--
 -- As an example, the single Unicode code point U-fb00 (LATIN SMALL
 -- LIGATURE FF) can be resolved into the multi character string 'ff'
 -- instead of being converted to the single character string 'ﬀ'
@@ -383,6 +389,60 @@ local function set_output_line_length(cols)
   __opts.output_line_length = cols
 end
 M.set_output_line_length = set_output_line_length
+
+
+--- Clear all code point translation relations.
+-- After calling this function, there are no known code point
+-- translation relations and no code point translation takes place
+-- during text extraction.
+local function clear_all_translations()
+  __transl_codepoint = {}
+  setmetatable(__transl_codepoint,
+               {
+                 __index = __meta_cp2utf8,
+               }
+  )
+end
+M.clear_all_translations = clear_all_translations
+
+
+--- Manage Unicode code point translation relations.
+-- This function can be used to set-up code point translation relations.
+-- First argument must be a number, second argument must be a string in
+-- the UTF-8 encoding or `nil`.<br />
+--
+-- If the second argument is a string, after calling this function, the
+-- Unicode code point given as first argument, when found in a node list
+-- during text extraction, is translated into the string given as second
+-- argument instead of into a UTF-8 encoded character corresponding to
+-- the code point.<br />
+--
+-- If the second argument is `nil`, after calling this function, any
+-- translation relation for the given code point is non-existent.
+--
+-- @param cp A Unicode code point, e.g., 0xfb00 for the code point LATIN
+-- SMALL LIGATURE FF.
+-- @param newt  New translation string or `nil`.
+-- @return Old translation string in the code point translation relation
+-- (possibly `nil`).  If any arguments are invalid (code point not of
+-- type `number` or not in the range 0 to 0x10ffff or translation string
+-- argument neither of type `string` nor `nil`), return value is
+-- `false`.
+local function set_translation(cp, newt)
+  -- Prevent from invalid entries in translation table.
+  if (type(cp) ~= 'number') or
+     (cp < 0) or
+     (cp > 0x10ffff) or
+     ((type(newt) ~= 'string') and (type(newt) ~= 'nil')) then
+    return false
+  end
+  -- Retrieve old translation string.
+  local oldt = rawget(__transl_codepoint, cp)
+  -- Set new translation relation.
+  __transl_codepoint[cp] = newt
+  return oldt
+end
+M.set_translation = set_translation
 
 
 --- Module initialisation.
