@@ -21,6 +21,13 @@ local tabinsert = table.insert
 local utf8len = unicode.utf8.len
 
 
+-- Short-cuts for constants.
+local DISC = node.id('disc')
+local GLYPH = node.id('glyph')
+local KERN = node.id('kern')
+local PUNCT = node.id('punct')
+
+
 --- Convert Unicode code points to UTF-8.
 -- This function converts Unicode code points to UTF-8 characters.  It
 -- is modelled after the following table taken from the UTF-8 and
@@ -117,7 +124,7 @@ build_paragraph = function(head)
     -- Whitespace mode?
     if not withinword then
       -- Search for beginning of a word.
-      if n.id == 37 then
+      if n.id == GLYPH then
         withinword = true
         word = {}
       end
@@ -125,12 +132,12 @@ build_paragraph = function(head)
     -- Word mode?
     if withinword then
       -- Store the characters of the current word.
-      if n.id == 37 then
+      if n.id == GLYPH then
         tabinsert(word, cp2utf8(n.char))
       end
       -- Search for the end of the current word.
       -- This definition of a word fails on '\LaTeX'!
-      if not ((n.id == 37) or (n.id == 7) or (n.id == 22) or (n.id == 11)) then
+      if not ((n.id == GLYPH) or (n.id == DISC) or (n.id == KERN) or (n.id == PUNCT)) then
         withinword = false
         -- Convert word from table to string representation.
         tabinsert(paragraph, tabconcat(word))
