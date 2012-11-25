@@ -12,9 +12,6 @@
 --
 
 
-fd = io.open(tex.jobname .. '.txt','wb')
-
-
 -- Function short-cuts.
 local tabconcat = table.concat
 local tabinsert = table.insert
@@ -66,6 +63,25 @@ local transl_codepoint = {
 setmetatable(transl_codepoint, transl_codepoint.mt)
 
 
+-- This table represents the document.  It contains all text of the
+-- type-set document as an array of paragraphs.  A paragraph is an array
+-- of single words.  At the end of the LuaTeX run, all paragraphs of the
+-- document are broken into lines of a fixed length and the lines are
+-- then written to a file.  Here's the rationale of this approach:
+--
+-- * It saves space.  In Lua strings are internalized.  Since, in
+--   general, in texts the same words are used over and over again,
+--   relatively few strings are actually stored in memory.
+--
+-- * It reduces file access during the LuaTeX run.
+--
+-- * It allows for pre-processing the document text before writing it to
+--   a file.
+--
+-- Create an empty document.
+local text_document = {}
+
+
 --- Scan a node list for words.
 -- The given node list is scanned for chaines of nodes representing a
 -- word.  These words are stored as a list of UTF-8 encoded strings.
@@ -109,7 +125,9 @@ end
 -- @param head  Node list.
 local function nodelist_to_text(head)
   local par = build_text_paragraph(head)
-  write_paragraph(fd, 72, par)
+  if #par > 0 then
+     tabinsert(text_document, par)
+  end
 end
 
 
@@ -137,43 +155,64 @@ local function cb_hf_pkg_spelling(head)
 end
 
 
---- Write the words of a paragraph to a file with a fixed line length.
+--- Break a paragraph into lines of a fixed length and write the lines
+--- to a file.
+--
+-- @param par  A text paragraph (an array of words).
 -- @param f  A file handle.
 -- @param maxlinelength  Maximum line length in output.
--- @param par  A list of strings.
-write_paragraph = function(f, maxlinelength, par)
-  -- A line is a list of strings.
-  local line = {}
-  -- Set current line length to maximum to trigger a blank line before
-  -- writing the paragraph.
-  local llen = maxlinelength
-  -- Iterate over words in paragraph.
-  for _, word in ipairs(par) do
-    local wlen = utf8len(word)
+local function write_text_paragraph(par, f, maxlinelength)
+  -- Index of first word on current line.  Initialize current line with
+  -- first word of paragraph.
+  local lstart = 1
+  -- Track current line length.
+  local llen = utf8len(par[1])
+  -- Iterate over remaining words in paragraph.
+  for i = 2,#par do
+    local wlen = utf8len(par[i])
     -- Does word fit onto current line?
     if llen + 1 + wlen <= maxlinelength then
       -- Append word to current line.
-      tabinsert(line, ' ')
-      tabinsert(line, word)
       llen = llen + 1 + wlen
     else
-      -- Output current line.
-      f:write(tabconcat(line), '\n')
-      -- Store word on new current line.
-      line = { word }
+      -- Write the current line up to the preceeding word to file (words
+      -- separated by spaces and with a trailing newline).
+      f:write(tabconcat(par, ' ', lstart, i-1), '\n')
+      -- Initialize new current line.
+      lstart = i
       llen = wlen
     end
   end
-  -- If non-empty, output last line of paragraph.
-  if #line > 0 then
-    f:write(tabconcat(line), '\n')
+  -- Write last line of paragraph.
+  f:write(tabconcat(par, ' ', lstart), '\n')
+end
+
+
+--- Write all text stored in the document structure to a file.
+local function write_text_document()
+  -- Open output file.
+  local f = assert(io.open(tex.jobname .. '.txt', 'wb'))
+  -- Iterate through document paragraphs.
+  for _,par in ipairs(text_document) do
+    -- Separate paragraphs by a blank line.
+    f:write('\n')
+    -- Write paragraph to file.
+    write_text_paragraph(par, f, 72)
+    -- Delete written paragraph.
+    par = nil
   end
+  -- Close output file.
+  f:close()
+end
+
+
+--- Callback function that writes all document text into a file.
+local function cb_stopr_pkg_spelling()
+  write_text_document()
 end
 
 
 -- Register callback functions.
 luatexbase.add_to_callback('pre_linebreak_filter', cb_plf_pkg_spelling, 'cb_plf_pkg_spelling')
 luatexbase.add_to_callback('hpack_filter', cb_hf_pkg_spelling, 'cb_hf_pkg_spelling')
-
-
---~ fd:close()
+luatexbase.add_to_callback('stop_run', cb_stopr_pkg_spelling, 'cb_stopr_pkg_spelling')
