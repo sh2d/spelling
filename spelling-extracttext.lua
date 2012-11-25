@@ -386,18 +386,26 @@ M.set_output_line_length = set_output_line_length
 
 
 --- Module initialisation.
--- Set default output file name.
-set_output_file_name(tex.jobname .. '.txt')
--- Set default output line length.
-set_output_line_length(72)
--- Set default output EOL character.
-if (os.type == 'windows') or (os.type == 'msdos') then
-  set_output_eol('\r\n')
-else
-  set_output_eol('\n')
+--
+local function __init()
+  -- Set default output file name.
+  set_output_file_name(tex.jobname .. '.txt')
+  -- Set default output line length.
+  set_output_line_length(72)
+  -- Set default output EOL character.
+  if (os.type == 'windows') or (os.type == 'msdos') then
+    set_output_eol('\r\n')
+  else
+    set_output_eol('\n')
+  end
+  -- Register callaback: at the end of the TeX run, output all extracted
+  -- text.
+  luatexbase.add_to_callback('stop_run', __cb_stopr_pkg_spelling, '__cb_stopr_pkg_spelling')
 end
--- At the end of the TeX run, output all extracted text.
-luatexbase.add_to_callback('stop_run', __cb_stopr_pkg_spelling, '__cb_stopr_pkg_spelling')
+
+
+-- Initialize module.
+__init()
 
 
 -- Return module table.
