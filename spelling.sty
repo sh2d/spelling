@@ -28,3 +28,14 @@
 \AtBeginShipout{%
   \directlua name {spelling-atbeginshipout}{cb_AtBeginShipout_pkg_spelling(\the\AtBeginShipoutBox)}%
 }
+% Provide command for reading-in a list of bad spellings.
+\newcommand*{\spellingreadbad}[1]{%
+  \directlua{
+    pkg_spelling_stage[1].read_bad_strings('\luaescapestring{#1}')
+  }%
+}
+% Try to read a list of bad spellings from file `\jobname.spb'.
+\IfFileExists{\jobname.spb}{%
+  \spellingreadbad{\jobname.spb}%
+}{%
+}

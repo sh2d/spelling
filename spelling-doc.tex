@@ -47,6 +47,8 @@ basicstyle=\ttfamily,
 \newcommand*{\pkg}{\textsf{spelling}}
 \newcommand*{\acr}[1]{\mbox{\scshape#1}}
 \newcommand*{\descr}[1]{〈\emph{#1}〉}
+\newcommand*{\cmd}[1]{\mbox{\ttfamily\textbackslash#1}}
+\newcommand*{\macro}[1]{\cmd{#1}\marginpar{\cmd{#1}}}
 \newcommand*{\latinphrase}[1]{\foreignlanguage{latin}{\emph{#1}}}
 \newcommand*{\lpeg}{\latinphrase{e.\,g.}\xspace}
 \begin{document}
@@ -174,6 +176,19 @@ The work-flow of the \pkg\ package is as follows:
   \end{enumerate}
 
 \end{enumerate}
+
+
+\subsection{Loading bad words}
+\label{sec:wordlists}
+
+As described above, if a file \descr{jobname}|.spb| exists, it is loaded
+by the \pkg\ package.  The words found in the file are stored in an
+internal list of bad spellings and are later used for highlighting
+spelling mistakes in \acr{pdf} output.  Words from additional files can
+be appended to the internal list of bad spellings with the
+\macro{spellingreadbad} command.  Argument is a file name.  The format
+of a word list file is one word per line.  The same word may occur
+multiple times.  The file must be in the \acr{utf-8} encoding.
 
 
 \end{document}
