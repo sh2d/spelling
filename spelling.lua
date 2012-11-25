@@ -52,11 +52,8 @@
 -- external code.  Table indices correspond to the stages as shown
 -- above.<br />
 --
--- <i>Note, as spell-checking and bad string highlighting are not yet
--- implemented, all current code of stages 1 and 2 is collected in one
--- module.  That is, there are currently three modules available:</i>
---
 -- <ul>
+--   <li><code>spelling-stage-1.lua : pkg_spelling_stage[1]</code></li>
 --   <li><code>spelling-stage-2.lua : pkg_spelling_stage[2]</code></li>
 --   <li><code>spelling-stage-3.lua : pkg_spelling_stage[3]</code></li>
 --   <li><code>spelling-stage-4.lua : pkg_spelling_stage[4]</code></li>
@@ -66,7 +63,11 @@
 -- @name pkg_spelling_stage
 pkg_spelling_stage = {
 
-  -- text tagging
+  -- string list loading
+  [1] = require 'spelling-stage-1',
+  -- node list tagging
+  -- spell-checking
+  -- bad string highlighting
   [2] = require 'spelling-stage-2',
   -- text storage
   [3] = require 'spelling-stage-3',
@@ -81,6 +82,11 @@ pkg_spelling_stage = {
 --
 -- @class table
 -- @name res
+--
+-- @field is_bad  Table.<br />
+--
+-- This table maps all strings known as bad spellings to the value
+-- `true`.
 --
 -- @field text_document  Table.<br />
 --
@@ -121,6 +127,7 @@ pkg_spelling_stage = {
 --
 local res = {
 
+  is_bad,
   text_document,
   whatsit_uid,
 
@@ -131,9 +138,11 @@ local res = {
 --
 local function __init()
   -- Create resources.
+  res.is_bad = {}
   res.text_document = {}
   res.whatsit_uid = 163
   -- Make resources available to modules.
+  pkg_spelling_stage[1].set_resources(res)
   pkg_spelling_stage[2].set_resources(res)
   pkg_spelling_stage[3].set_resources(res)
   pkg_spelling_stage[4].set_resources(res)

@@ -18,9 +18,11 @@ Current maintainer: Stephan Hennig, <sh2d@arcor.de>
 ### Description
 
 This package aids spell-checking of TeX documents compiled with the
-LuaTeX engine.  It writes out the text of a document to a UTF-8 encoded
-text file during the TeX run.  The text file can then be checked by your
-favourite spell-checker application.
+LuaTeX engine.  It can give visual feedback in PDF output similar to
+WYSIWYG word processors.  The package relies on an external
+spell-checker application to check spelling of a text file and to output
+a list of bad spellings.  The package should work with most
+spell-checkers, even dumb, TeX-unaware ones.
 
 
 
@@ -49,6 +51,7 @@ _Happy TeXing!_
     spelling.lua
     spelling.sty
     spelling-recurse.lua
+    spelling-stage-1.lua
     spelling-stage-2.lua
     spelling-stage-3.lua
     spelling-stage-4.lua

@@ -55,10 +55,14 @@ local KERN = node.id('kern')
 local WHATSIT = node.id('whatsit')
 local LOCAL_PAR = node.subtype('local_par')
 local USER_DEFINED = node.subtype('user_defined')
+local PDF_COLORSTACK = node.subtype('pdf_colorstack')
 
 
 -- Declare local variables to store references to resources that are
 -- provided by external code.
+--
+-- Table of known bad spellings.
+local __is_bad
 --
 -- ID of user-defined whatsit nodes.
 local __whatsit_uid
@@ -70,9 +74,36 @@ local __whatsit_uid
 --
 -- @param res  Ressource table.
 local function set_resources(res)
+  __is_bad = res.is_bad
   __whatsit_uid = res.whatsit_uid
 end
 M.set_resources = set_resources
+
+
+--- Module options.
+-- This table contains all module options.  User functions to set
+-- options are provided.
+--
+-- @class table
+-- @name __opts
+-- @field hl_color  Colour used for highlighting bad spellings in PDF
+-- output.
+local __opts = {
+  hl_color,
+}
+
+
+--- Set colour used for highlighting.
+-- Set colourused for highlighting bad spellings in PDF output.
+--
+-- @param col New colour.  This must be a colour statement in PDF format
+-- given as string.  As an example, the string `1 0 0 rg` represents a
+-- red colour in the RGB colour space.  A similar colour in the CMYK
+-- colour space would be represented by the string '0 1 1 0 k'.
+local function set_highlight_color(col)
+  __opts.hl_color = col
+end
+M.set_highlight_color = set_highlight_color
 
 
 --- Convert a Unicode code point to a regular UTF-8 encoded string.
@@ -235,6 +266,38 @@ local function __tag_word(word)
 end
 
 
+--- Highlight bad spelling by colour.
+-- Insert colour whatsits before and after the first and last nodes
+-- known to belong to the current word.
+local function __highlight_by_color()
+  -- Check, if start node of current word is a head node.  Inserting
+  -- before head nodes needs special attention.  This is not yet
+  -- implemented.
+  if (__curr_word_start ~= __curr_word_start_head) then
+    -- Create pdf_colorstack whatsit nodes.
+     local push = node_new(WHATSIT, PDF_COLORSTACK)
+     local pop = node_new(WHATSIT, PDF_COLORSTACK)
+     push.stack = 0
+     pop.stack = 0
+     push.cmd = 1
+     pop.cmd = 2
+     push.data = __opts.hl_color
+     node_insert_before(__curr_word_start_head, __curr_word_start, push)
+     node_insert_after(__curr_word_end_head, __curr_word_end, pop)
+  end
+end
+
+
+--- Generic function for highlighting bad spellings.
+local function __highlight_bad_word()
+  __highlight_by_color()
+end
+
+
+-- Highlighting status.
+local __is_active_highlighting
+
+
 --- Data structure that stores the characters of a word string.
 -- The current word data structure is an ordered list (an array) of the
 -- characters of the word.  The characters are collected while scanning
@@ -278,6 +341,10 @@ local function __finish_current_word()
     end
     -- Tag node list with word string.
     __tag_word(word)
+    -- Test for bad spelling.
+    if __is_active_highlighting and __is_bad[word] then
+      __highlight_bad_word()
+    end
     __curr_word = nil
   end
   __curr_word_start_head = nil
@@ -444,6 +511,24 @@ end
 M.disable_text_tagging = disable_text_tagging
 
 
+--- Start highlighting bad spellings.
+-- After calling this function, bad spellings are highlighted in PDF
+-- output.
+local function enable_word_highlighting()
+  __is_active_highlighting = true
+end
+M.enable_word_highlighting = enable_word_highlighting
+
+
+--- Stop highlighting bad spellings.
+-- After calling this function, no more bad spellings are highlighted in
+-- PDF output.
+local function disable_word_highlighting()
+  __is_active_highlighting = false
+end
+M.disable_word_highlighting = disable_word_highlighting
+
+
 --- Module initialisation.
 --
 local function __init()
@@ -451,6 +536,10 @@ local function __init()
   __is_vlist_paragraph = {}
   -- Remember call-back status.
   __is_active_tagging = false
+  -- Remember highlighting status.
+  __is_active_highlighting = false
+  -- Set default highlighting colour.
+  set_highlight_color('1 0 0 rg')
 end
 
 
