@@ -52,8 +52,10 @@ local WHATSIT = node.id('whatsit')
 --
 -- @class table
 -- @name __opts
+-- @field output_file_name  Output file name.
 -- @field output_line_length  Line length in output.
 local __opts = {
+  output_file_name,
   output_line_lenght,
 }
 
@@ -293,7 +295,7 @@ end
 --- Write all text stored in the document structure to a file.
 local function __write_text_document()
   -- Open output file.
-  local f = assert(io.open(tex.jobname .. '.txt', 'wb'))
+  local f = assert(io.open(__opts.output_file_name, 'wb'))
   -- Iterate through document paragraphs.
   for _,par in ipairs(__text_document) do
     -- Separate paragraphs by a blank line.
@@ -344,6 +346,16 @@ end
 M.stop_text_extraction = stop_text_extraction
 
 
+--- Set output file name.
+-- Text output will be written to a file with the given name.
+--
+-- @param name  New output file name.
+local function set_output_file_name(name)
+  __opts.output_file_name = name
+end
+M.set_output_file_name = set_output_file_name
+
+
 --- Set output line length.
 -- Set the number of columns in text output.  Text output will be
 -- wrapped at spaces so that lines don't contain more than the specified
@@ -361,6 +373,8 @@ M.set_output_line_length = set_output_line_length
 
 
 --- Module initialisation.
+-- Set default output file name.
+set_output_file_name(tex.jobname .. '.txt')
 -- Set default output line length.
 set_output_line_length(72)
 -- At the end of the TeX run, output all extracted text.
