@@ -168,9 +168,7 @@ local __text_document = {}
 --
 -- @class table
 -- @name __curr_paragraph
-
--- Create an empty text paragraph.
-local __curr_paragraph = {}
+local __curr_paragraph
 
 
 --- Data structure that stores the characters of a word while scanning a
@@ -183,26 +181,37 @@ local __curr_paragraph = {}
 --
 -- @class table
 -- @name __curr_word
-
--- Create an empty word in table representation.
-local __curr_word = {}
+local __curr_word
 
 
---- Finish current paragraph and start a new one.
--- The current paragraph is finished: If non-empty, the current word is
--- appended to the current paragraph, which in turn, if non-empty, is
--- appended to the document structure.  After calling this function, the
--- current word and current paragraph are empty.
-local function __start_text_paragraph()
-  -- Insert non-empty current word into current paragraph.
-  if #__curr_word > 0 then
+--- Finish current word.
+-- If the current word contains visible characters, store the current
+-- word in the current paragraph.
+local function __finish_current_word()
+  -- Finish a word?
+  if __curr_word then
+    -- Provide new empty paragraph, if necessary.
+    if not __curr_paragraph then
+      __curr_paragraph = {}
+    end
+    -- Append current word to current paragraph.
     tabinsert(__curr_paragraph, tabconcat(__curr_word))
-    __curr_word = {}
+    __curr_word = nil
   end
-  -- Insert non-empty current paragraph into document structure.
-  if #__curr_paragraph > 0 then
+end
+
+
+--- Finish current paragraph.
+-- If the current paragraph contains words, store the current paragraph
+-- in the text document.
+local function __finish_current_paragraph()
+  -- Finish current word.
+  __finish_current_word()
+  -- Finish a paragraph?
+  if __curr_paragraph then
+    -- Append current paragraph to document structure.
     tabinsert(__text_document, __curr_paragraph)
-    __curr_paragraph = {}
+    __curr_paragraph = nil
   end
 end
 
@@ -217,33 +226,31 @@ local function __scan_nodelist_for_text(head)
     local nid = n.id
     -- Test for vlist node.
     if nid == VLIST then
-      -- Recurse into vlist, starting a new paragraph before and after.
-      -- Possible improvement: If the vlist is empty or contains a
-      -- single hlist only, don't start a new paragraph.  A bad hack,
-      -- but it would help with the \LaTeX logo.
-      __start_text_paragraph()
+      -- Recurse into vlist, ending the current paragraph before and
+      -- after.  Possible improvement: If the vlist is empty or contains
+      -- a single hlist only, don't end the current paragraph.  A bad
+      -- hack, but it would help with the \LaTeX logo.
+      __finish_current_paragraph()
       __scan_nodelist_for_text(n.head)
-      __start_text_paragraph()
+      __finish_current_paragraph()
     -- Test for hlist node.
     elseif nid == HLIST then
       -- Seamlessly recurse into hlist as if it were non-existent.
       __scan_nodelist_for_text(n.head)
     -- Test for glyph node.
     elseif nid == GLYPH then
+      -- Provide new empty word, if necessary.
+      if not __curr_word then
+        __curr_word = {}
+      end
       -- Append character to current word.
       tabinsert(__curr_word, __codepoint_map[n.char])
     -- Test for other word component nodes.
     elseif (nid == DISC) or (nid == KERN) or (nid == PUNCT) then
       -- We're still within the current word.  Do nothing.
     else
-      -- End of current word detected.  If non-empty, append current
-      -- word to current paragraph, converting it from table to string
-      -- representation first.
-      if #__curr_word > 0 then
-        tabinsert(__curr_paragraph, tabconcat(__curr_word))
-        -- Start new current word.
-        __curr_word = {}
-      end
+      -- End of current word detected.
+      __finish_current_word()
     end
   end
 end
@@ -254,9 +261,8 @@ end
 --
 -- @param head  Node list.
 local function __nodelist_to_text(head)
-  __start_text_paragraph()
   __scan_nodelist_for_text(head)
-  __start_text_paragraph()
+  __finish_current_paragraph()
 end
 
 
