@@ -18,9 +18,10 @@
 -- to store it in a text document data structure.
 --
 -- In the text document, words are stored as UTF-8 encoded strings.  A
--- mapping mechanism is provided by which, during word recognition,
--- individual code-points, e.g., of glyph nodes, can be translated to
--- arbitrary UTF-8 strings, e.g., ligatures to single letters.
+-- mapping mechanism is provided by which, during word string
+-- recognition, individual code-points, e.g., of glyph nodes, can be
+-- translated to arbitrary UTF-8 strings, e.g., ligatures to single
+-- letters.
 --
 -- @author Stephan Hennig
 -- @copyright 2012 Stephan Hennig
@@ -36,6 +37,11 @@ module(...)
 local M = {}
 
 
+-- Import helper module.
+local __recurse = require 'spelling-recurse'
+local __recurse_node_list = __recurse.recurse_node_list
+
+
 -- Function short-cuts.
 local tabconcat = table.concat
 local tabinsert = table.insert
@@ -45,10 +51,8 @@ local utf8char = unicode.utf8.char
 -- Short-cuts for constants.
 local DISC = node.id('disc')
 local GLYPH = node.id('glyph')
-local HLIST = node.id('hlist')
 local KERN = node.id('kern')
 local PUNCT = node.id('punct')
-local VLIST = node.id('vlist')
 local WHATSIT = node.id('whatsit')
 
 
@@ -202,7 +206,7 @@ local __curr_paragraph
 local __curr_word
 
 
---- Finish current word.
+--- Act upon detection of end of current word string.
 -- If the current word contains visible characters, store the current
 -- word in the current paragraph.
 local function __finish_current_word()
@@ -219,7 +223,7 @@ local function __finish_current_word()
 end
 
 
---- Finish current paragraph.
+--- Act upon detection of end of current paragraph.
 -- If the current paragraph contains words, store the current paragraph
 -- in the text document.
 local function __finish_current_paragraph()
@@ -234,52 +238,63 @@ local function __finish_current_paragraph()
 end
 
 
---- Scan a node list for text and append that to the document structure.
--- The given node list is scanned for chaines of nodes representing a
--- word.  These words are stored in the current paragraph.
+--- Find chains of nodes representing a string.
+-- While scanning a node list, this call-back function identifies chains
+-- of nodes representing a string.
 --
--- @param head  Node list.
-local function __scan_nodelist_for_text(head)
-  for n in node.traverse(head) do
-    local nid = n.id
-    -- Test for vlist node.
-    if nid == VLIST then
-      -- Recurse into vlist, ending the current paragraph before and
-      -- after.  Possible improvement: If the vlist is empty or contains
-      -- a single hlist only, don't end the current paragraph.  A bad
-      -- hack, but it would help with the \LaTeX logo.
-      __finish_current_paragraph()
-      __scan_nodelist_for_text(n.head)
-      __finish_current_paragraph()
-    -- Test for hlist node.
-    elseif nid == HLIST then
-      -- Seamlessly recurse into hlist as if it were non-existent.
-      __scan_nodelist_for_text(n.head)
-    -- Test for glyph node.
-    elseif nid == GLYPH then
-      -- Provide new empty word, if necessary.
-      if not __curr_word then
-        __curr_word = {}
-      end
-      -- Append character to current word.
-      tabinsert(__curr_word, __codepoint_map[n.char])
-    -- Test for other word component nodes.
-    elseif (nid == DISC) or (nid == KERN) or (nid == PUNCT) then
-      -- We're still within the current word.  Do nothing.
-    else
-      -- End of current word detected.
-      __finish_current_word()
+-- @param head  Head node of current branch.
+-- @param n  The current node.
+local function __visit_node(head, n)
+  local nid = n.id
+  -- Test for word string component node.
+  if nid == GLYPH then
+    -- Provide new empty word, if necessary.
+    if not __curr_word then
+      __curr_word = {}
     end
+    -- Append character to current word string.
+    tabinsert(__curr_word, __codepoint_map[n.char])
+  -- Test for other word string component nodes.
+  elseif (nid == DISC) or (nid == KERN) then
+    -- We're still within the current word string.  Do nothing.
+  else
+    -- End of current word string detected.
+    __finish_current_word()
   end
 end
 
 
---- Scan a node list for text, starting a new paragraph before and
---- after.
+--- Table of call-back functions for node list recursion: store the
+--- word strings found in a node list.
+-- The call-back functions in this table identify chains of nodes
+-- representing word strings in a node list and stores the strings in
+-- the text document.  Before and after nodes of type `vlist`, a new
+-- paragraph is started.  Nodes of type `hlist` are recursed into as if
+-- they were non-existent.  That is, the LaTeX input `a\mbox{a b}b` is
+-- recognized as two word strings `aa` and `bb`.
+--
+-- @class table
+-- @name __cb_store_words
+-- @field vlist_pre_recurse  Finish current paragraph.
+-- @field vlist_post_recurse  Finish current paragraph.
+-- @field visit_node  Find nodes representing a word string.
+local __cb_store_words = {
+
+  vlist_pre_recurse = __finish_current_paragraph,
+  vlist_post_recurse = __finish_current_paragraph,
+  visit_node = __visit_node,
+
+}
+
+
+--- Process node list according to this stage.
+-- This function recurses into the given node list, extracts all text
+-- and stores it in the text document.
 --
 -- @param head  Node list.
-local function __nodelist_to_text(head)
-  __scan_nodelist_for_text(head)
+local function __process_node_list(head)
+  __recurse_node_list(head, __cb_store_words)
+  -- Clean-up left-over word and/or paragraph.
   __finish_current_paragraph()
 end
 
@@ -290,7 +305,7 @@ end
 -- @param head  Node list.
 -- @return true
 local function __cb_pre_linebreak_filter_pkg_spelling(head)
-  __nodelist_to_text(head)
+  __process_node_list(head)
   return true
 end
 
