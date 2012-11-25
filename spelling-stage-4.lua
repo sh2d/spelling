@@ -152,7 +152,7 @@ local function __write_text_document()
     -- Write paragraph to file.
     __write_text_paragraph(par, f, __opts.output_line_length)
     -- Delete paragraph from memory.
-    par = nil
+    __text_document[_] = nil
   end
   -- Close output file.
   f:close()
