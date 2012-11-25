@@ -22,8 +22,11 @@ local utf8len = unicode.utf8.len
 -- Short-cuts for constants.
 local DISC = node.id('disc')
 local GLYPH = node.id('glyph')
+local HLIST = node.id('hlist')
 local KERN = node.id('kern')
 local PUNCT = node.id('punct')
+local VLIST = node.id('vlist')
+local WHATSIT = node.id('whatsit')
 
 
 -- With this table it is possible to translate Unicode code points to
@@ -82,23 +85,58 @@ setmetatable(transl_codepoint, transl_codepoint.mt)
 local text_document = {}
 
 
---- Scan a node list for words.
+-- The current paragraph (an array of words).  This non-local variable
+-- is used while searching a node list for text in function
+-- `scan_nodelist_for_text`.
+local curr_paragraph = {}
+-- The current word (an array of UTF-8 encoded strings).  This non-local
+-- variable is used while searching a node list for text in function
+-- `scan_nodelist_for_text`.
+local curr_word = {}
+
+
+--- Finish current paragraph and start a new one.
+-- The current paragraph is finished: The current word, if non-empty is
+-- appended to the current paragraph, which in turn, if non-empty, is
+-- appended to the document structure.  After calling this function, the
+-- current word and current paragraph are empty.
+local function start_text_paragraph()
+  -- Insert non-empty current word into current paragraph.
+  if #curr_word > 0 then
+    tabinsert(curr_paragraph, tabconcat(curr_word))
+    curr_word = {}
+  end
+  -- Insert non-empty current paragraph into document structure.
+  if #curr_paragraph > 0 then
+    tabinsert(text_document, curr_paragraph)
+    curr_paragraph = {}
+  end
+end
+
+
+--- Scan a node list for text and append that to the document structure.
 -- The given node list is scanned for chaines of nodes representing a
 -- word.  These words are stored as a list of UTF-8 encoded strings.
 --
 -- @param head  Node list.
--- @return A list of UTF-8 encoded strings.
-local function build_text_paragraph(head)
-  -- A paragraph is a list of UTF-8 encoded strings.
-  local curr_paragraph = {}
-  -- For efficiency, the characters of a word are stored in a list and
-  -- only later concatenated via `table.concat`.
-  local curr_word = {}
-  --Iterate over node list.
+local function scan_nodelist_for_text(head)
   for n in node.traverse(head) do
     local nid = n.id
+    -- Test for vlist node.
+    if nid == VLIST then
+      -- Recurse into vlist, starting a new paragraph before and after.
+      -- Possible improvement: If the vlist is empty or contains a
+      -- single hlist only, don't start a new paragraph.  A bad hack,
+      -- but it would help with the \LaTeX logo.
+      start_text_paragraph()
+      scan_nodelist_for_text(n.head)
+      start_text_paragraph()
+    -- Test for hlist node.
+    elseif nid == HLIST then
+      -- Recurse into hlist.
+      scan_nodelist_for_text(n.head)
     -- Test for glyph node.
-    if nid == GLYPH then
+    elseif nid == GLYPH then
       -- Append character to current word.
       tabinsert(curr_word, transl_codepoint[n.char])
     -- Test for other word component nodes.
@@ -115,19 +153,17 @@ local function build_text_paragraph(head)
       end
     end
   end
-  return curr_paragraph
 end
 
 
---- Write the text of a node list to a file.
--- The node list is not manipulated.
+--- Scan a node list for text, starting a new paragraph before and
+--- after.
 --
 -- @param head  Node list.
 local function nodelist_to_text(head)
-  local par = build_text_paragraph(head)
-  if #par > 0 then
-     tabinsert(text_document, par)
-  end
+  start_text_paragraph()
+  scan_nodelist_for_text(head)
+  start_text_paragraph()
 end
 
 
@@ -138,18 +174,6 @@ end
 -- @param head  Node list.
 -- @return true
 local function cb_plf_pkg_spelling(head)
-  nodelist_to_text(head)
-  return true
-end
-
-
---- Callback function that scans a node list for text and stores that in
---- the document structure.
--- The node list is not manipulated.
---
--- @param head  Node list.
--- @return true
-local function cb_hf_pkg_spelling(head)
   nodelist_to_text(head)
   return true
 end
@@ -214,5 +238,4 @@ end
 
 -- Register callback functions.
 luatexbase.add_to_callback('pre_linebreak_filter', cb_plf_pkg_spelling, 'cb_plf_pkg_spelling')
-luatexbase.add_to_callback('hpack_filter', cb_hf_pkg_spelling, 'cb_hf_pkg_spelling')
 luatexbase.add_to_callback('stop_run', cb_stopr_pkg_spelling, 'cb_stopr_pkg_spelling')
