@@ -425,6 +425,64 @@ table rows).  If the argument is~2, a blank line is inserted before and
 after every table cell.  By default, no blank lines are inserted.
 
 
+\section{Bugs}
+\label{sec:bugs}
+
+Note, this package is in a very early state.  Expect bugs!  Package
+development is hosted at
+\href{http://github.com/sh2d/spelling/}{\bfseries GitHub}.  The full
+list of known bugs and feature requests can be found in the
+\href{http://github.com/sh2d/spelling/issues/}{\bfseries issue tracker}.
+New bugs should be reported there.
+
+The most user-visible issues are listed below:
+
+\begin{itemize}
+
+\item There's no support for the Plain \TeX\ or Con\TeX\ formats other
+  than the \acr{API} of the package's Lua modules, yet
+  (\href{https://github.com/sh2d/spelling/issues/1}{issue~1}).
+
+\item Macros provided by the \LaTeX\ package have very long names.  A
+  \emph{key-value} package option interface would be much more
+  user-friendly
+  (\href{https://github.com/sh2d/spelling/issues/2}{issue~2}).
+
+\item There are a couple of issues with text extraction and highlighting
+  incorrect spellings:
+
+  \begin{itemize}
+
+  \item Text in head and foot lines is neither extracted nor highlighted
+    (\href{https://github.com/sh2d/spelling/issues/7}{issue~7}).
+
+  \item Punctuation characters are currently not stripped from words.
+    If the list of bad spellings contains an entry, say,
+    \emph{incorect}, and the text contains that spelling directly
+    followed by a comma, a quotation mark \lpetc, the incorect spelling
+    is not highlighted
+    (\href{https://github.com/sh2d/spelling/issues/8}{issue~8}).
+
+  \item The first word starting right after an |hlist|, \lpeg, the first
+    word within an |\mbox|, is never highlighted.  It is extracted and
+    written to the text file, though
+    (\href{https://github.com/sh2d/spelling/issues/6}{issue~6}).
+
+  \item Bad spellings that are hyphenated at a page break are not
+    highlighted
+    (\href{https://github.com/sh2d/spelling/issues/10}{issue~10}).
+
+  \end{itemize}
+
+
+\end{itemize}
+
+Any contributions are warmly welcome!
+
+\bigskip
+\emph{Happy \TeX ing!}
+
+
 \end{document}
 
 
