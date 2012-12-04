@@ -427,6 +427,190 @@ table rows).  If the argument is~2, a blank line is inserted before and
 after every table cell.  By default, no blank lines are inserted.
 
 
+\section{LanguageTool support}
+\label{sec:languagetool}
+
+Installing spell-checkers and dictionaries can be a difficult task if
+there are no pre-built packages available for an architecture.  That's
+one reason the \pkg\ package is rather spell-checker agnostic and the
+manual doesn't recommend a particular spell-checker application.
+Another reason is, there's no best spell-checker.  The only
+recommendation the author makes is not to trust in one spell-checker,
+but to use multiple spell-checkers at the same time, with different
+dictionaries or, better yet, different checking engines under the hood.
+
+Among the set of options available, LanguageTool, a style and grammar
+checker%
+\footnote{\url{http://www.languagetool.org/}}
+%
+that can also check spelling since version~1.8, deserves some notice for
+its portability, ease of installation and active development.  For these
+reasons, the \pkg\ package provides explicit LanguageTool support.
+LanguageTool uses Hunspell as the spell-checking engine, augmenting
+results with a rule based engine and a morphological analyser (depending
+on the language).  The \pkg\ package can parse LanguageTool's error
+reports in the \acr{xml} format, pick those errors that are spelling
+related and use them to highlight bad spellings.%
+\footnote{Support for style and grammar errors found by LanguageTool
+  should be possible, but requires major restructuring of the \pkg\
+  package that won't happen any time soon.}
+
+
+\subsection{Installation}
+\label{sec:lt-installation}
+
+Here are some brief installation instructions for the stand-alone
+version of LanguageTool (tested with LanguageTool~2.0).  The stand-alone
+version contains a \acr{gui} as well as a command-line interface.  For
+the \pkg\ package, the latter is needed.
+
+\begin{enumerate}
+
+\item LanguageTool is primarily written in Java.  Make sure a recent
+  Java Runtime Environment (\acr{jre}) is installed.
+
+\item\label{enum:run-java} Open a command-line and type
+
+\begin{lstlisting}
+java -version
+\end{lstlisting}
+%
+  If you get an error message, find out the full path to the Java
+  executable (called |java.exe| on Windows) for later reference.
+
+\item Download the stand-alone version of LanguageTool (should be a
+  \acr{zip} archive).
+
+\item Uncompress the downloaded archive to a location of your choice.
+
+\item Open a command-line in the directory containing file
+  |LanguageTool.jar| and type
+
+\begin{lstlisting}[escapeinside=°°]
+°\descr{path to}°/java -jar LanguageTool.jar --help
+\end{lstlisting}
+%
+  Prepending the path to the Java executable is optional, depending on
+  the result in step~\ref{enum:run-java}.  If you now see a list of
+  LanguageTool's command-line options rush by, all is well.
+
+\item For easier access to LanguageTool, create a small batch script and
+  put that somewhere into the |PATH|.
+
+  \begin{itemize}
+
+  \item For users of Unixoid systems, the script might look like
+
+\begin{lstlisting}[escapeinside=°°]
+#!/bin/sh
+°\descr{path to}°/java -jar °\descr{path to}°/LanguageTool.jar $*
+\end{lstlisting}
+%
+    where \texttt{\descr{path to}} should point to the Java executable
+    (optional) and file |LanguageTool.jar| (mandatory).  If the script
+    is named |lt.sh|, you should be able to run LanguageTool on the
+    command shell by typing, \lpeg,
+
+\begin{lstlisting}
+sh lt.sh --version
+\end{lstlisting}
+%
+    Don't forget to put the script into the |PATH|!  For other ways of
+    making scripts executable, please consult the operating system
+    documentation.
+
+  \item For Windows users, the script might look like
+
+\begin{lstlisting}[escapeinside=°°]
+@echo off
+°\descr{path to}°\java -jar °\descr{path to}°\LanguageTool.jar %*
+\end{lstlisting}
+%
+    where \texttt{\descr{path to}} should point to the Java executable
+    (optional) and file |LanguageTool.jar| (mandatory).  If the script
+    is named |lt.bat|, you should be able to run LanguageTool on the
+    command-line by typing, \lpeg,
+
+\begin{lstlisting}
+lt --version
+\end{lstlisting}
+%
+    Don't forget to put the script into the |PATH|!
+
+  \end{itemize}
+
+\end{enumerate}
+
+
+\subsection{Usage}
+\label{sec:lt-usage}
+
+The results of checking a text file with LanguageTool are written to an
+error report, either in a human readable format or in a machine friendly
+\acr{xml} format.  The \pkg\ package can only parse the latter format.
+When it was said in \autoref{sec:wordlists} that the \pkg\ package reads
+files \descr{jobname}|.spell.bad| and \descr{jobname}|.spell.good|, if
+they exist, that was not the whole truth.  Additionally, a file
+\descr{jobname}|.spell.xml| is read, if it exists.  This file should
+contain a LanguageTool error report in the \acr{xml} format.  Additional
+LanguageTool \acr{xml} error reports can be loaded via the
+\macro{spellingreadLT} command.  Argument is a file name.  Macros
+|\spellingreadLT|, |\spellingreadbad| and |\spellingreadgood| can be
+used in combination in a \TeX\ file.
+
+To check a text file and create an error report in the \acr{xml} format,
+LanguageTool can be called on the command-line like this
+\begin{lstlisting}[escapeinside=°°]
+lt °\descr{options}° °\descr{input file}° > °\descr{error report}°
+\end{lstlisting}
+where \texttt{\descr{options}} is a list of options described below,
+\texttt{\descr{input file}} is the text file written by the \pkg\
+package in the first Lua\TeX\ run and \texttt{\descr{error report}} is
+the file containing the error report.  Note, how standard output is
+redirected to a file via the |>| operator.  By default, LanguageTool
+writes error reports to standard output, that is, the command-line.
+Redirection is a feature most operating systems provide.
+
+\begin{itemize}
+
+\item Option |-l| determines the language (variant) of the file to
+  check.  As an example, language variant US English can be selected via
+  |-l en-US|.  The full list of languages supported by LanguageTool can
+  be requested via option |--list|.
+
+\item Option |-c| determines the encoding of the input file.  Since the
+  text file written by the \pkg\ package is in the \acr{utf-8} encoding,
+  this part should be |-c utf-8|.
+
+\item By default, LanguageTool outputs error reports in a human readable
+  format.  The \pkg\ package can only parse error reports in the
+  \acr{xml} format.  If the |--api| option is present, LanguageTool
+  outputs \acr{xml} data.
+
+\item Users that don't want to highlight bad spellings, but prefer to
+  study the list of bad spellings themselves, should refer to the |-u|
+  option.  But note, that with the latter option present, LanguageTool
+  doesn't output pure \acr{xml} any more, even if the |--api| option is
+  present.  Make sure such error reports aren't read by the \pkg\
+  package.
+
+\item If the |--help| option is present, LanguageTool shows more
+  information about command-line options.
+
+\end{itemize}
+
+As an example, to compile a \LaTeX\ file |myletter.tex| written in
+French that uses the \pkg\ package with standard settings to highlight
+bad spellings and to use LanguageTool as a spell-checker, the following
+commands should be typed on the command-line:
+
+\begin{lstlisting}
+lualatex myproject
+lt --api -c utf-8 -l fr myletter.spell.txt > myletter.spell.xml
+lualatex myproject
+\end{lstlisting}
+
+
 \section{Bugs}
 \label{sec:bugs}
 
