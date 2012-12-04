@@ -12,6 +12,14 @@
 --
 
 
+--- Main Lua file.
+--
+-- @author Stephan Hennig
+-- @copyright 2012, 2013 Stephan Hennig
+-- @release version 0.3
+--
+
+
 --- Global table of modules.
 -- The work of the spelling package can be separated into four
 -- stages:<br />
