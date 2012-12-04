@@ -145,33 +145,34 @@ The work-flow of the \pkg\ package is as follows:
 
 \item After the package is loaded in the preamble of a |.tex| source
   file via °\usepackage{spelling}°, a list of bad spellings is read from
-  a file named \descr{jobname}|.spb|, if that file exists.
+  a file named \descr{jobname}|.spell.bad|, if that file exists.
 
 \item During the Lua\TeX\ run, text is extracted from pages and all
   words are checked against the list of bad spellings.  Words with a
   known incorrect spelling are highlighted in \acr{pdf} output.
 
 \item At the end of the Lua\TeX\ run, in addition to the \acr{pdf} file,
-  a text file is written, named \descr{jobname}|.txt|, by default.  The
-  text file should contain most of the text of the original document.
+  a text file is written, named \descr{jobname}|.spell.txt|, by default.
+  The text file should contain most of the text of the original
+  document.
 
 \item The text file is then checked by your favourite spell-checker
   application, \lpeg, Aspell or Hunspell.  The spell-checker should be
   able to write a list of bad spellings to a file.  Otherwise, visual
   feedback in \acr{pdf} output won't work.  The file should preferably
-  be named \descr{jobname}|.spb|, but any other file name works just as
-  well.
+  be named \descr{jobname}|.spell.bad|, but any other file name works
+  just as well.
 
 \item Now, there are two ways to proceed:
 
   \begin{enumerate}
 
   \item Visually minded people may just compile their document a second
-    time.  This time, file \descr{jobname}|.spb| is read-in again and
-    the words with incorrect spelling found by the spell-checker should
-    now be highlighted in \acr{pdf} output.  Checking the \acr{pdf}
-    file, the necessary corrections to the |.tex| source file can be
-    applied.
+    time.  This time, file \descr{jobname}|.spell.bad| is read-in again
+    and the words with incorrect spelling found by the spell-checker
+    should now be highlighted in \acr{pdf} output.  Checking the
+    \acr{pdf} file, the necessary corrections to the |.tex| source file
+    can be applied.
 
   \item If you're not interested in visual feedback or if your
     spell-checker doesn't provide a non-interactive mode, you can as
@@ -190,20 +191,20 @@ The work-flow of the \pkg\ package is as follows:
 \subsection{Word lists}
 \label{sec:wordlists}
 
-As described above, if a file \descr{jobname}|.spb| exists, it is loaded
-by the \pkg\ package.  The words found in the file are stored in an
-internal list of bad spellings and are later used for highlighting
+As described above, if a file \descr{jobname}|.spell.bad| exists, it is
+loaded by the \pkg\ package.  The words found in the file are stored in
+an internal list of bad spellings and are later used for highlighting
 spelling mistakes in \acr{pdf} output.  Words from additional files can
 be appended to the internal list of bad spellings with the
 \macro{spellingreadbad} command.  Argument is a file name.  The format
 of a word list file is one word per line.  The same word may occur
 multiple times.  The file must be in the \acr{utf-8} encoding.
 
-In addition to file \descr{jobname}|.spb|, a second file
-\descr{jobname}|.spg| is read, if that file exists.  The words found in
-that file are stored in an internal list of good spellings.  Words in
-the Lua\TeX\ document are only considered spelling mistakes if they
-occur in the list of bad spellings, but not in the list of good
+In addition to file \descr{jobname}|.spell.bad|, a second file
+\descr{jobname}|.spell.good| is read, if that file exists.  The words
+found in that file are stored in an internal list of good spellings.
+Words in the Lua\TeX\ document are only considered spelling mistakes if
+they occur in the list of bad spellings, but not in the list of good
 spellings.  That is, words in the list of good spellings are never
 highlighted in \acr{pdf} output.  The list of good spellings can be used
 to deal with false positives (words incorrectly reported as bad
@@ -283,7 +284,8 @@ output is enabled, by default.
 
 \paragraph{File name} \hspace{0pt plus 5em} Text output file name can be
 configured via command \macro{spellingoutputname}.  Argument is the new
-file name.  Default text output file name is \descr{jobname}|.txt|.
+file name.  Default text output file name is
+\descr{jobname}|.spell.txt|.
 
 \paragraph{Line length} In text output, paragraphs can either be broken
 into lines of a fixed length or paragraph can be put on a single line.

@@ -144,7 +144,7 @@ end
 --
 local function __write_text_document()
   -- Open output file.
-  local fname = __opts.output_file_name or (tex.jobname .. '.txt')
+  local fname = __opts.output_file_name or (tex.jobname .. '.spell.txt')
   local f = assert(io.open(fname, 'wb'))
   local eol = __opts.output_eol
   -- Iterate through document paragraphs.
