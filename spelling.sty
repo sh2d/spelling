@@ -22,7 +22,13 @@
 \fi
 \RequirePackage{ifthen}
 \RequirePackage{luatexbase}
-\directlua name {spelling}{dofile('spelling.lua')}
+% Load main Lua file.
+\directlua name {spelling}{
+  % The main Lua file is not a module, so we must pass a full path to
+  % `dofile`.
+  local f = kpse.find_file('spelling.lua', 'lua')
+  dofile(f)
+}
 % Words are extracted after pages have been built.  In lack of a proper
 % Lua call-back, we're hooking into shipout from the LaTeX side.
 \RequirePackage{atbegshi}
