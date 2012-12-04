@@ -297,15 +297,14 @@ configured via command \macro{spellingoutputname}.  Argument is the new
 file name.  Default text output file name is
 \descr{jobname}|.spell.txt|.
 
-\paragraph{Line length} In text output, paragraphs can either be broken
-into lines of a fixed length or paragraph can be put on a single line.
-The behaviour can be controlled via command
-\macro{spellingoutputlinelength}.  Argument is a number.  If the number
-is smaller than~1, paragraphs are put on a single line.  For larger
-arguments, the number specifies the maximum line length.  Note, lines
-are broken at spaces only.  Words longer than maximum line length are
-put on a single line exceeding maximum line length.  Default line length
-is~72.
+\paragraph{Line length} In text output, paragraphs can either be put on
+a single line or broken into lines of a fixed length.  The behaviour can
+be controlled via command \macro{spellingoutputlinelength}.  Argument is
+a number.  If the number is~0 or less, paragraphs are put on a single
+line.  For larger arguments, the number specifies the maximum line
+length.  Note, lines are broken at spaces only.  Words longer than
+maximum line length are put on a single line exceeding maximum line
+length.  Default line length is~72.
 
 \paragraph{Line ending convention} The end-of-line (\acr{eol}) character
 in text output can be configured via command \macro{spellingoutputeol}.
