@@ -128,16 +128,12 @@
     pkg_spelling_stage[3].set_table_paragraphs(\luaescapestring{#1})
   }%
 }
-% Try to read a list of bad spellings from file `\jobname.spb'.
-\IfFileExists{\jobname.spb}{%
-  \spellingreadplainfile{bad}{\jobname.spb}%
-}{%
-}
-% Try to read a list of good spellings from file `\jobname.spg'.
-\IfFileExists{\jobname.spg}{%
-  \spellingreadplainfile{good}{\jobname.spg}%
-}{%
-}
+%
+% Read bad and good spellings from default sources.
+\directlua{
+  pkg_spelling_stage[1].parse_default_bad_and_good()
+}%
+%
 % Enable visual feedback.
 \spellinghighlight{on}
 % Enable text ouput at the end of the LuaTeX run.

@@ -110,5 +110,32 @@ end
 M.parse_good_plain_list_file = parse_good_plain_list_file
 
 
+--- Parse default sources for bad and good strings.
+-- All strings found in default sources for words with known incorrect
+-- spelling are mapped to the boolean value `true` in table `__is_bad`.
+-- All strings found in default sources for words with known correct
+-- spelling are mapped to the boolean value `true` in table `__is_good`.
+-- Default sources for bad spellings are file `<jobname>.spb`.  Default
+-- sources for good spellings are file `<jobname>.spg`.
+local function parse_default_bad_and_good()
+  local fname, f
+  -- Try to read bad spellings from plain list file '<jobname>.spb'.
+  fname = tex.jobname .. '.spb'
+  f = io.open(fname, 'r')
+  if f then
+     f:close()
+     parse_bad_plain_list_file(fname)
+  end
+  -- Try to read good spellings from plain list file '<jobname>.spg'.
+  fname = tex.jobname .. '.spg'
+  f = io.open(fname, 'r')
+  if f then
+     f:close()
+     parse_good_plain_list_file(fname)
+  end
+end
+M.parse_default_bad_and_good = parse_default_bad_and_good
+
+
 -- Return module table.
 return M
