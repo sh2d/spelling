@@ -2,6 +2,26 @@ This material is subject to the LaTeX Project Public License. See
 <http://www.latex-project.org/lppl/> for the details of that license.
 
 
+### v0.3 ()
+
+New:
+
+  * [LanguageTool][lt] support: LanguageTool error reports in the XML
+    format can be parsed for spelling errors (with the help of the
+    [LuaXML][luaxml] package).  LanguageTool is a cross-platform style
+    and grammar checker.
+
+[lt]: http://www.languagetool.org/
+[luaxml]: http://www.ctan.org/pkg/luaxml
+
+Changes:
+
+  * Default file names used by the package have been changed:
+
+        <jobname>.bad     ==>    <jobname>.spell.bad
+        <jobname>.good    ==>    <jobname>.spell.good
+        <jobname>.txt     ==>    <jobname>.spell.txt
+
 
 ### v0.2 (2012-12-04)
 
