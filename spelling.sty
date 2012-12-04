@@ -47,6 +47,13 @@
     pkg_spelling_stage[1].parse_good_plain_list_file('\luaescapestring{#1}')
   }%
 }
+% Provide command for reading bad spellings from a LanguageTool XML
+% file.
+\newcommand*{\spellingreadLT}[1]{%
+  \directlua{
+    pkg_spelling_stage[1].parse_XML_LanguageTool_file('\luaescapestring{#1}')
+  }%
+}
 % Provide command for enabling/disabling visual feedback.
 \newcommand*{\spellinghighlight}[1]{%
   \ifthenelse{\equal{#1}{on}}{%

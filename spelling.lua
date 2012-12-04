@@ -20,8 +20,8 @@
 --
 -- <dt>Stage 1</dt>
 --   <dd><ul>
---     <li>Load list(s) of bad strings.</li>
---     <li>Load list(s) of good strings.</li>
+--     <li>Load bad strings.</li>
+--     <li>Load good strings.</li>
 --   </ul></dd>
 --
 -- <dt>Stage 2  (call-back <code>pre_linebreak_filter</code>)</dt>
@@ -64,7 +64,7 @@
 -- @name pkg_spelling_stage
 pkg_spelling_stage = {
 
-  -- string list loading
+  -- bad and good string loading
   [1] = require 'spelling-stage-1',
   -- node list tagging
   -- spell-checking
