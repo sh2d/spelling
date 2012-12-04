@@ -62,21 +62,21 @@ M.set_resources = set_resources
 -- @param t  Table that maps strings to the value `true`.
 -- @return Number of total and new strings found.
 local function __parse_plain_list_file(fname, t)
+  local f, err = io.open(fname, 'r')
+  if not f then
+    texio.write_nl('package spelling: Error! Can\'t parse plain word list: file ' .. fname)
+    error(err)
+  end
   local total_c = 0
   local new_c = 0
-  local f, msg = io.open(fname, 'r')
-  if f then
-    -- Iterate line-wise through file.
-    for l in f:lines() do
-      -- Map string to boolean value `true`.
-      if not t[l] then
-        t[l] = true
-        new_c = new_c + 1
-      end
-      total_c = total_c + 1
+  -- Iterate line-wise through file.
+  for l in f:lines() do
+    -- Map string to boolean value `true`.
+    if not t[l] then
+      t[l] = true
+      new_c = new_c + 1
     end
-  else
-    texio.write_nl('package spelling: Warning! Could not open file: ' .. msg)
+    total_c = total_c + 1
   end
   return total_c, new_c
 end
