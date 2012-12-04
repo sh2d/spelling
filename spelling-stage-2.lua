@@ -21,7 +21,7 @@
 --
 -- @author Stephan Hennig
 -- @copyright 2012 Stephan Hennig
--- @release version 0.1
+-- @release version 0.2
 --
 -- @trick Prevent LuaDoc from looking past here for module description.
 --[[ Trick LuaDoc into entering 'module' mode without using that command.
