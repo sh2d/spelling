@@ -200,29 +200,33 @@ The work-flow of the \pkg\ package is as follows:
 As described above, if a file \descr{jobname}|.spell.bad| exists, it is
 loaded by the \pkg\ package.  The words found in the file are stored in
 an internal list of bad spellings and are later used for highlighting
-spelling mistakes in \acr{pdf} output.  Words from additional files can
-be appended to the internal list of bad spellings with the
-\macro{spellingreadbad} command.  Argument is a file name.  The format
-of a word list file is one word per line.  The same word may occur
-multiple times.  The file must be in the \acr{utf-8} encoding.
+spelling mistakes in \acr{pdf} output.
 
-In addition to file \descr{jobname}|.spell.bad|, a second file
-\descr{jobname}|.spell.good| is read, if that file exists.  The words
-found in that file are stored in an internal list of good spellings.
-Words in the Lua\TeX\ document are only considered spelling mistakes if
-they occur in the list of bad spellings, but not in the list of good
-spellings.  That is, words in the list of good spellings are never
-highlighted in \acr{pdf} output.  The list of good spellings can be used
-to deal with false positives (words incorrectly reported as bad
-spellings by the spell-checker).  Words from additional files can be
-appended to the internal list of good spellings with the
-\macro{spellingreadgood} command.  Argument is a file name.  File format
-is one word per line.  The same word may occur multiple times.  The file
-must be in the \acr{utf-8} encoding.
+Additionally, a second file \descr{jobname}|.spell.good| is read, if
+that file exists.  The words found in that file are stored in an
+internal list of good spellings.  Words in the list of good spellings
+are never highlighted in \acr{pdf} output.  That is, words in the
+Lua\TeX\ document are only considered spelling mistakes if they occur in
+the list of bad spellings, but not in the list of good spellings.  The
+list of good spellings can be used to deal with false positives (words
+incorrectly reported as bad spellings by the spell-checker).
 
-Note, most spell-checkers provide means to deal with unknown words via
-additional dictionaries.  It is recommended to configure your
-spell-checker to report as few false positives as possible.
+Words from additional files can be appended to the internal lists of bad
+and good spellings with the \macro{spellingreadbad} and
+\macro{spellingreadgood} commands.  Argument to both macros is a file
+name.  File format is one word per line.  Letter case is significant.
+The file must be in the \acr{utf-8} encoding.  As an example, the
+command
+
+\begin{lstlisting}[language={[LaTeX]TeX}]
+\spellingreadgood{myproject.whitelist}
+\end{lstlisting}
+%
+reads words from a file |myproject.whitelist| and adds them to the list
+of good spellings.  Note, most spell-checkers provide means to deal with
+unknown words via additional dictionaries.  It is recommended to
+configure your spell-checker to report as few false positives as
+possible.
 
 
 \subsection{Highlighting spellling mistakes}
