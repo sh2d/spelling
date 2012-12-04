@@ -53,14 +53,15 @@ end
 M.set_resources = set_resources
 
 
---- Generic function for reading a list of strings from a file.
--- All strings read from the given file are mapped to the boolean value
--- `true`.  The format of the file is simple: one string per file.
+--- Generic function for parsing a plain list of strings read from a
+--- file.
+-- All strings found are mapped to the boolean value `true`.  The format
+-- of the input file is one string per line.
 --
--- @param fname  Name of file containing strings.
+-- @param fname  File name.
 -- @param t  Table that maps strings to the value `true`.
--- @return Number of total and new strings read.
-local function __read_strings(fname, t)
+-- @return Number of total and new strings found.
+local function __parse_plain_list_file(fname, t)
   local total_c = 0
   local new_c = 0
   local f, msg = io.open(fname, 'r')
@@ -81,41 +82,32 @@ local function __read_strings(fname, t)
 end
 
 
---- Read a list of bad strings from a file.
--- All strings read from the given file (words with known incorrect
--- spelling) are mapped to the boolean value `true` in table `__is_bad`.
+--- Parse a plain list of bad strings read from a file.
+-- All strings found (words with known incorrect spelling) are mapped to
+-- the boolean value `true` in table `__is_bad`.  The format of the
+-- input file is one string per line.
 --
--- @param fname  Name of file containing bad strings.  If an empty string
--- is provided, strings are read from file `<jobname>.bad`.
-local function read_bad_strings(fname)
-  -- If file name is empty, set default file name.
-  if fname == '' then
-    fname = tex.jobname .. '.bad'
-  end
-  local total, new = __read_strings(fname, __is_bad)
+-- @param fname  File name.
+local function parse_bad_plain_list_file(fname)
+  local total, new = __parse_plain_list_file(fname, __is_bad)
   texio.write_nl('package spelling: ' .. total .. ' bad strings ('
                  .. new .. ' new) read from file \'' .. fname .. '\'.')
 end
-M.read_bad_strings = read_bad_strings
+M.parse_bad_plain_list_file = parse_bad_plain_list_file
 
 
---- Read a list of good strings from a file.
--- All strings read from the given file (words with known correct
--- spelling) are mapped to the boolean value `true` in table
--- `__is_good`.
+--- Parse a plain list of good strings read from a file.
+-- All strings found (words with known correct spelling) are mapped to
+-- the boolean value `true` in table `__is_good`.  The format of the
+-- input file is one string per line.
 --
--- @param fname  Name of file containing good strings.  If an empty
--- string is provided, strings are read from file `<jobname>.good`.
-local function read_good_strings(fname)
-  -- If file name is empty, set default file name.
-  if fname == '' then
-    fname = tex.jobname .. '.good'
-  end
-  local total, new = __read_strings(fname, __is_good)
+-- @param fname  File name.
+local function parse_good_plain_list_file(fname)
+  local total, new = __parse_plain_list_file(fname, __is_good)
   texio.write_nl('package spelling: ' .. total .. ' good strings ('
                  .. new .. ' new) read from file \'' .. fname .. '\'.')
 end
-M.read_good_strings = read_good_strings
+M.parse_good_plain_list_file = parse_good_plain_list_file
 
 
 -- Return module table.

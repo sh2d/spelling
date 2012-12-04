@@ -38,13 +38,13 @@
 % Provide command for reading-in a list of bad spellings.
 \newcommand*{\spellingreadbad}[1]{%
   \directlua{
-    pkg_spelling_stage[1].read_bad_strings('\luaescapestring{#1}')
+    pkg_spelling_stage[1].parse_bad_plain_list_file('\luaescapestring{#1}')
   }%
 }
 % Provide command for reading-in a list of good spellings.
 \newcommand*{\spellingreadgood}[1]{%
   \directlua{
-    pkg_spelling_stage[1].read_good_strings('\luaescapestring{#1}')
+    pkg_spelling_stage[1].parse_good_plain_list_file('\luaescapestring{#1}')
   }%
 }
 % Provide command for enabling/disabling visual feedback.
@@ -130,12 +130,12 @@
 }
 % Try to read a list of bad spellings from file `\jobname.spb'.
 \IfFileExists{\jobname.spb}{%
-  \spellingreadbad{\jobname.spb}%
+  \spellingreadplainfile{bad}{\jobname.spb}%
 }{%
 }
 % Try to read a list of good spellings from file `\jobname.spg'.
 \IfFileExists{\jobname.spg}{%
-  \spellingreadgood{\jobname.spg}%
+  \spellingreadplainfile{good}{\jobname.spg}%
 }{%
 }
 % Enable visual feedback.
