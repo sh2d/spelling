@@ -216,7 +216,11 @@ local function parse_XML_LanguageTool_file(fname)
   -- file reader.
   local s = f:read('*all')
   f:close()
-  local total, new = __parse_XML_LanguageTool(s)
+  local success, total, new = pcall(__parse_XML_LanguageTool, s)
+  if not success then
+    texio.write_nl('package spelling: Error! Can\'t parse LanguageTool XML error report: file ' .. fname)
+    error(total)
+  end
   texio.write_nl('package spelling: ' .. total .. ' bad strings ('
                  .. new .. ' new) read from file \'' .. fname .. '\'.')
 end
