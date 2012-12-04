@@ -67,10 +67,13 @@ local function __parse_plain_list_file(fname, t)
     texio.write_nl('package spelling: Error! Can\'t parse plain word list: file ' .. fname)
     error(err)
   end
+  -- Read complete plain file into string, to speed-up file operations.
+  local s = f:read('*all')
+  f:close()
   local total_c = 0
   local new_c = 0
   -- Iterate line-wise through file.
-  for l in f:lines() do
+  for l in s:gmatch('[^\r\n]+') do
     -- Map string to boolean value `true`.
     if not t[l] then
       t[l] = true
