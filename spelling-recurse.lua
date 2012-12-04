@@ -1,5 +1,5 @@
 --- spelling-recurse.lua
---- Copyright 2012 Stephan Hennig
+--- Copyright 2012, 2013 Stephan Hennig
 --
 -- This work may be distributed and/or modified under the conditions of
 -- the LaTeX Project Public License, either version 1.3 of this license
@@ -17,8 +17,8 @@
 -- user-provided call-back functions upon certain events.
 --
 -- @author Stephan Hennig
--- @copyright 2012 Stephan Hennig
--- @release version 0.2
+-- @copyright 2012, 2013 Stephan Hennig
+-- @release version 0.3
 --
 -- @trick Prevent LuaDoc from looking past here for module description.
 --[[ Trick LuaDoc into entering 'module' mode without using that command.

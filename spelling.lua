@@ -1,5 +1,5 @@
 --- spelling.lua
---- Copyright 2012 Stephan Hennig
+--- Copyright 2012, 2013 Stephan Hennig
 --
 -- This work may be distributed and/or modified under the conditions of
 -- the LaTeX Project Public License, either version 1.3 of this license
