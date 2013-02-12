@@ -133,13 +133,14 @@ package follows the third approach, providing some unique features:
 \section{Usage}
 \label{sec:usage}
 
-The \pkg\ package requires the Lua\TeX\ engine.  Currently, only the
-\LaTeX\ format is supported.  \emph{The package consists of Lua modules
-  that do the actual work.  The \LaTeX\ package is effectively a wrapper
-  around the modules' Lua-API.  Implementing support for other formats
-  shouldn't be too difficult.  Since the author is a \LaTeX-only user,
-  support has to be contributed by, \lpeg, you.  By the way, the \LaTeX\
-  package needs some polishing, too.  Contributions are welcome!}
+The \pkg\ package requires the Lua\TeX\ engine.  All functionality of
+the package is implemented in Lua.  The \LaTeX\ interface, which is
+described below, is effectively a wrapper around the Lua interface.
+
+\emph{Implementing such wrappers for other formats shouldn't be too
+  difficult.  The author is a \LaTeX-only user, though, and therefore
+  grateful for contributions.  By the way, the \LaTeX\ package needs
+  some polishing, too, \lpeg, a key-value interface is desirable.}
 
 
 \subsection{Work-flow}
