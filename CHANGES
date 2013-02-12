@@ -18,9 +18,9 @@ Changes:
 
   * Default file names used by the package have been changed:
 
-        <jobname>.bad     ==>    <jobname>.spell.bad
-        <jobname>.good    ==>    <jobname>.spell.good
-        <jobname>.txt     ==>    <jobname>.spell.txt
+        <jobname>.spb   =>   <jobname>.spell.bad
+        <jobname>.spg   =>   <jobname>.spell.good
+        <jobname>.txt   =>   <jobname>.spell.txt
 
 
 ### v0.2 (2012-12-04)
