@@ -444,26 +444,26 @@ Installing spell-checkers and dictionaries can be a difficult task if
 there are no pre-built packages available for an architecture.  That's
 one reason the \pkg\ package is rather spell-checker agnostic and the
 manual doesn't recommend a particular spell-checker application.
-Another reason is, there's no best spell-checker.  The only
+Another reason is, there is no best spell-checker.  The only
 recommendation the author makes is not to trust in one spell-checker,
 but to use multiple spell-checkers at the same time, with different
 dictionaries or, better yet, different checking engines under the hood.
 
-Among the set of options available, LanguageTool, a style and grammar
-checker%
-\footnote{\url{http://www.languagetool.org/}}
+Among the set of options available, LanguageTool%
+\footnote{\url{http://www.languagetool.org/}}%
 %
-that can also check spelling since version~1.8, deserves some notice for
-its portability, ease of installation and active development.  For these
-reasons, the \pkg\ package provides explicit LanguageTool support.
-LanguageTool uses Hunspell as the spell-checking engine, augmenting
-results with a rule based engine and a morphological analyser (depending
-on the language).  The \pkg\ package can parse LanguageTool's error
-reports in the \acr{xml} format, pick those errors that are spelling
-related and use them to highlight bad spellings.%
-\footnote{Support for style and grammar errors found by LanguageTool
+, a style and grammar checker that can also check spelling since
+version~1.8, deserves some notice for its portability, ease of
+installation and active development.  For these reasons, the \pkg\
+package provides explicit LanguageTool support.  LanguageTool uses
+Hunspell as the spell-checking engine, augmenting results with a rule
+based engine and a morphological analyser (depending on the language).
+The \pkg\ package can parse LanguageTool's error reports in the
+\acr{xml} format, pick those errors that are spelling related and use
+them to highlight bad spellings.%
+\footnote{Highlighting style and grammar errors found by LanguageTool
   should be possible, but requires major restructuring of the \pkg\
-  package that won't happen any time soon.}
+  package.}
 
 
 \subsection{Installation}
@@ -509,7 +509,7 @@ java -version
 
   \begin{itemize}
 
-  \item For users of Unixoid systems, the script might look like
+  \item For users of unixoide systems, the script might look like
 
 \begin{lstlisting}[escapeinside=°°]
 #!/bin/sh
@@ -615,9 +615,9 @@ bad spellings and to use LanguageTool as a spell-checker, the following
 commands should be typed on the command-line:
 
 \begin{lstlisting}
-lualatex myproject
+lualatex myletter
 lt --api -c utf-8 -l fr myletter.spell.txt > myletter.spell.xml
-lualatex myproject
+lualatex myletter
 \end{lstlisting}
 
 
