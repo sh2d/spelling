@@ -38,86 +38,86 @@
 % Provide command for reading-in a list of bad spellings.
 \newcommand*{\spellingreadbad}[1]{%
   \directlua{
-    pkg_spelling_stage[1].parse_bad_plain_list_file('\luaescapestring{#1}')
+    PKG_spelling.stage[1].parse_bad_plain_list_file('\luaescapestring{#1}')
   }%
 }
 % Provide command for reading-in a list of good spellings.
 \newcommand*{\spellingreadgood}[1]{%
   \directlua{
-    pkg_spelling_stage[1].parse_good_plain_list_file('\luaescapestring{#1}')
+    PKG_spelling.stage[1].parse_good_plain_list_file('\luaescapestring{#1}')
   }%
 }
 % Provide command for reading bad spellings from a LanguageTool XML
 % file.
 \newcommand*{\spellingreadLT}[1]{%
   \directlua{
-    pkg_spelling_stage[1].parse_XML_LanguageTool_file('\luaescapestring{#1}')
+    PKG_spelling.stage[1].parse_XML_LanguageTool_file('\luaescapestring{#1}')
   }%
 }
 % Provide command for enabling/disabling visual feedback.
 \newcommand*{\spellinghighlight}[1]{%
   \ifthenelse{\equal{#1}{on}}{%
     \directlua{
-      pkg_spelling_stage[2].enable_word_highlighting()
+      PKG_spelling.stage[2].enable_word_highlighting()
     }%
   }{%
     \directlua{
-      pkg_spelling_stage[2].disable_word_highlighting()
+      PKG_spelling.stage[2].disable_word_highlighting()
     }%
   }%
 }
 % Provide command for setting visual feedback colour.
 \newcommand*{\spellinghighlightcolor}[1]{%
   \directlua{
-    pkg_spelling_stage[2].set_highlight_color('\luaescapestring{#1}')
+    PKG_spelling.stage[2].set_highlight_color('\luaescapestring{#1}')
   }%
 }
 % Provide command for enabling/disabling text ouput.
 \newcommand*{\spellingoutput}[1]{%
   \ifthenelse{\equal{#1}{on}}{%
     \directlua{
-      pkg_spelling_stage[4].enable_text_output()
+      PKG_spelling.stage[4].enable_text_output()
     }%
   }{%
     \directlua{
-      pkg_spelling_stage[4].disable_text_output()
+      PKG_spelling.stage[4].disable_text_output()
     }%
   }%
 }
 % Provide command for setting text output file name.
 \newcommand*{\spellingoutputname}[1]{%
   \directlua{
-    pkg_spelling_stage[4].set_output_file_name('\luaescapestring{#1}')
+    PKG_spelling.stage[4].set_output_file_name('\luaescapestring{#1}')
   }%
 }
 % Provide command for setting text output file line length.
 \newcommand*{\spellingoutputlinelength}[1]{%
   \directlua{
-    pkg_spelling_stage[4].set_output_line_length('\luaescapestring{#1}')
+    PKG_spelling.stage[4].set_output_line_length('\luaescapestring{#1}')
   }%
 }
 % Provide command for setting text output EOL character.
 \newcommand*{\spellingoutputeol}[1]{%
   \directlua{
-    pkg_spelling_stage[4].set_output_eol('\luaescapestring{#1}')
+    PKG_spelling.stage[4].set_output_eol('\luaescapestring{#1}')
   }%
 }
 % Provide command for enabling/disabling text extraction.
 \newcommand*{\spellingextract}[1]{%
   \ifthenelse{\equal{#1}{on}}{%
     \directlua{
-      pkg_spelling_stage[2].enable_text_tagging()
+      PKG_spelling.stage[2].enable_text_tagging()
     }%
   }{%
     \directlua{
-      pkg_spelling_stage[2].disable_text_tagging()
+      PKG_spelling.stage[2].disable_text_tagging()
     }%
   }%
 }
 % Provide command to declare code point mappings.
 \newcommand*{\spellingmapping}[2]{%
   \directlua{
-    local r = pkg_spelling_stage[2].set_mapping(\luaescapestring{#1}, '\luaescapestring{#2}')
+    local r = PKG_spelling.stage[2].set_mapping(\luaescapestring{#1}, '\luaescapestring{#2}')
     if r == false then
       texio.write_nl('package spelling: invalid mapping: \luaescapestring{#1} => \luaescapestring{#2}')
     end
@@ -126,19 +126,19 @@
 % Provide command to clear all existing code point mappings.
 \newcommand*{\spellingclearallmappings}{%
   \directlua{
-    pkg_spelling_stage[2].clear_all_mappings()
+    PKG_spelling.stage[2].clear_all_mappings()
   }%
 }
 % Provide command to specify table paragraph behaviour.
 \newcommand*{\spellingtablepar}[1]{%
   \directlua{
-    pkg_spelling_stage[3].set_table_paragraphs(\luaescapestring{#1})
+    PKG_spelling.stage[3].set_table_paragraphs(\luaescapestring{#1})
   }%
 }
 %
 % Read bad and good spellings from default sources.
 \directlua{
-  pkg_spelling_stage[1].parse_default_bad_and_good()
+  PKG_spelling.stage[1].parse_default_bad_and_good()
 }%
 %
 % Enable visual feedback.

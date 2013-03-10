@@ -56,21 +56,22 @@
 -- </dl>
 --
 -- The code of the spelling package is organized in modules reflecting
--- these stages.  References to modules are made available in a global
--- table so that module's public functions are accessible from within
--- external code.  Table indices correspond to the stages as shown
--- above.<br />
+-- these stages.  References to modules are stored in a table.  Table
+-- indices correspond to the stages as shown above.  The table of module
+-- references is shared in a global table (`PKG_spelling`) so that
+-- public module functions are accessible from within external code.<br
+-- />
 --
 -- <ul>
---   <li><code>spelling-stage-1.lua : pkg_spelling_stage[1]</code></li>
---   <li><code>spelling-stage-2.lua : pkg_spelling_stage[2]</code></li>
---   <li><code>spelling-stage-3.lua : pkg_spelling_stage[3]</code></li>
---   <li><code>spelling-stage-4.lua : pkg_spelling_stage[4]</code></li>
+--   <li><code>spelling-stage-1.lua : stage[1]</code></li>
+--   <li><code>spelling-stage-2.lua : stage[2]</code></li>
+--   <li><code>spelling-stage-3.lua : stage[3]</code></li>
+--   <li><code>spelling-stage-4.lua : stage[4]</code></li>
 -- </ul>
 --
 -- @class table
--- @name pkg_spelling_stage
-pkg_spelling_stage = {
+-- @name stage
+stage = {
 
   -- bad and good string loading
   [1] = require 'spelling-stage-1',
@@ -149,6 +150,15 @@ local res = {
 }
 
 
+--- Global package table.
+-- This global table provides access to package-wide variables from
+-- within other chunks.
+--
+-- @class table
+-- @name PKG_spelling
+PKG_spelling = {}
+
+
 --- Package initialisation.
 --
 local function __init()
@@ -158,12 +168,14 @@ local function __init()
   res.text_document = {}
   res.whatsit_uid = 163
   -- Make resources available to modules.
-  pkg_spelling_stage[1].set_resources(res)
-  pkg_spelling_stage[2].set_resources(res)
-  pkg_spelling_stage[3].set_resources(res)
-  pkg_spelling_stage[4].set_resources(res)
+  stage[1].set_resources(res)
+  stage[2].set_resources(res)
+  stage[3].set_resources(res)
+  stage[4].set_resources(res)
+  -- Provide global access to module references.
+  PKG_spelling.stage = stage
   -- Enable text storage.
-  pkg_spelling_stage[3].enable_text_storage()
+  stage[3].enable_text_storage()
 end
 
 
