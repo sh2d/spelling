@@ -71,20 +71,7 @@
 --
 -- @class table
 -- @name stage
-stage = {
-
-  -- bad and good string loading
-  [1] = require 'spelling-stage-1',
-  -- node list tagging
-  -- spell-checking
-  -- bad string highlighting
-  [2] = require 'spelling-stage-2',
-  -- text storage
-  [3] = require 'spelling-stage-3',
-  -- text output
-  [4] = require 'spelling-stage-4',
-
-}
+stage = {}
 
 
 --- Table of package-wide resources that are shared among several
@@ -167,11 +154,21 @@ local function __init()
   res.is_good = {}
   res.text_document = {}
   res.whatsit_uid = 163
-  -- Make resources available to modules.
-  stage[1].set_resources(res)
-  stage[2].set_resources(res)
-  stage[3].set_resources(res)
-  stage[4].set_resources(res)
+  -- Provide global access to package ressources during module loading.
+  PKG_spelling.res = res
+  -- Load sub-modules:
+  -- * bad and good string loading
+  stage[1] = require 'spelling-stage-1'
+  -- * node list tagging
+  -- * spell-checking
+  -- * bad string highlighting
+  stage[2] = require 'spelling-stage-2'
+  -- * text storage
+  stage[3] = require 'spelling-stage-3'
+  -- * text output
+  stage[4] = require 'spelling-stage-4'
+  -- Remove global reference to package ressources.
+  PKG_spelling.res = nil
   -- Provide global access to module references.
   PKG_spelling.stage = stage
   -- Enable text storage.

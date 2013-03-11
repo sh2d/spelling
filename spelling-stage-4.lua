@@ -43,17 +43,6 @@ local utf8len = unicode.utf8.len
 local __text_document
 
 
---- Set module resources.
--- Make various resources, that are provided by external code, available
--- to this module.
---
--- @param res  Ressource table.
-local function set_resources(res)
-  __text_document = res.text_document
-end
-M.set_resources = set_resources
-
-
 --- Module options.
 -- This table contains all module options.  User functions to set
 -- options are provided.
@@ -200,6 +189,8 @@ M.disable_text_output = disable_text_output
 --- Module initialisation.
 --
 local function __init()
+  -- Get local references to package ressources.
+  __text_document = PKG_spelling.res.text_document
   -- Set default output file name.
   set_output_file_name(nil)
   -- Set default output line length.

@@ -45,18 +45,6 @@ local __is_bad
 local __is_good
 
 
---- Set module resources.
--- Make various resources, that are provided by external code, available
--- to this module.
---
--- @param res  Ressource table.
-local function set_resources(res)
-  __is_bad = res.is_bad
-  __is_good = res.is_good
-end
-M.set_resources = set_resources
-
-
 --- Generic function for parsing a plain list of strings read from a
 --- file.
 -- All strings found are mapped to the boolean value `true`.  The format
@@ -263,6 +251,19 @@ local function parse_default_bad_and_good()
   end
 end
 M.parse_default_bad_and_good = parse_default_bad_and_good
+
+
+--- Module initialisation.
+--
+local function __init()
+  -- Get local references to package ressources.
+  __is_bad = PKG_spelling.res.is_bad
+  __is_good = PKG_spelling.res.is_good
+end
+
+
+-- Initialize module.
+__init()
 
 
 -- Return module table.

@@ -71,19 +71,6 @@ local __is_good
 local __whatsit_uid
 
 
---- Set module resources.
--- Make various resources, that are provided by external code, available
--- to this module.
---
--- @param res  Ressource table.
-local function set_resources(res)
-  __is_bad = res.is_bad
-  __is_good = res.is_good
-  __whatsit_uid = res.whatsit_uid
-end
-M.set_resources = set_resources
-
-
 --- Module options.
 -- This table contains all module options.  User functions to set
 -- options are provided.
@@ -529,6 +516,10 @@ M.disable_word_highlighting = disable_word_highlighting
 --- Module initialisation.
 --
 local function __init()
+  -- Get local references to package ressources.
+  __is_bad = PKG_spelling.res.is_bad
+  __is_good = PKG_spelling.res.is_good
+  __whatsit_uid = PKG_spelling.res.whatsit_uid
   -- Create empty paragraph management stack.
   __is_vlist_paragraph = {}
   -- Remember tagging status.
