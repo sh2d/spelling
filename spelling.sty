@@ -33,7 +33,9 @@
 % Lua call-back, we're hooking into shipout from the LaTeX side.
 \RequirePackage{atbegshi}
 \AtBeginShipout{%
-  \directlua name {spelling-atbeginshipout}{cb_AtBeginShipout_pkg_spelling(\the\AtBeginShipoutBox)}%
+  \directlua name {spelling-atbeginshipout}{
+    PKG_spelling.cb_AtBeginShipout(\the\AtBeginShipoutBox)
+  }%
 }
 % Provide command for reading-in a list of bad spellings.
 \newcommand*{\spellingreadbad}[1]{%

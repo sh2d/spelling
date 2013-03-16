@@ -246,10 +246,11 @@ local __is_active_storage
 
 
 --- Call-back function that processes the node list.
--- <i>This is a global function!</i>
+-- <i>This function is not made available in the module table, but in
+-- the global package table!</i>
 --
 -- @param head  Node list.
-function cb_AtBeginShipout_pkg_spelling(box)
+local function cb_AtBeginShipout(box)
   if __is_active_storage then
     __process_node_list(tex.box[box])
   end
@@ -279,6 +280,8 @@ local function __init()
   -- Get local references to package ressources.
   __text_document = PKG_spelling.res.text_document
   __whatsit_uid = PKG_spelling.res.whatsit_uid
+  -- Make \AtBeginShipout function available in package table.
+  PKG_spelling.cb_AtBeginShipout = cb_AtBeginShipout
   -- Create empty paragraph management stack.
   __is_vlist_paragraph = {}
   -- Remember call-back status.
