@@ -6,17 +6,17 @@ This material is subject to the LaTeX Project Public License. See
 
 New:
 
-  * [LanguageTool][lt] support: LanguageTool error reports in the XML
-    format can be parsed for spelling errors (with the help of the
-    [LuaXML][luaxml] package).  LanguageTool is a cross-platform style
-    and grammar checker.
+* [LanguageTool][lt] support: LanguageTool error reports in the XML
+  format can be parsed for spelling errors (with the help of the
+  [LuaXML][luaxml] package).  LanguageTool is a cross-platform style and
+  grammar checker.
 
 [lt]: http://www.languagetool.org/
 [luaxml]: http://www.ctan.org/pkg/luaxml
 
 Changes:
 
-  * Default file names used by the package have been changed:
+* Default file names used by the package have been changed:
 
         <jobname>.spb   =>   <jobname>.spell.bad
         <jobname>.spg   =>   <jobname>.spell.good
@@ -27,10 +27,10 @@ Changes:
 
 Fixes:
 
-  * File `spelling.lua` could not be found by LaTeX style file
-    ([GitHub issue 14][#14]).
+* File `spelling.lua` could not be found by LaTeX style file
+  ([GitHub issue 14][ghi#14]).
 
-[#14]: https://github.com/sh2d/spelling/issues/14
+[ghi#14]: https://github.com/sh2d/spelling/issues/14
 
 
 ### v0.1 (2012-11-30)
