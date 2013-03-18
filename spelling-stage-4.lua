@@ -49,24 +49,12 @@ local __text_document
 --
 -- @class table
 -- @name __opts
--- @field output_eol  End-of-line  character in output.
 -- @field output_file_name  Output file name.
 -- @field output_line_length  Line length in output.
 local __opts = {
-  output_eol,
   output_file_name,
   output_line_lenght,
 }
-
-
---- Set output EOL character.
--- Text output will be written with the given end-of-line character.
---
--- @param eol  New output EOL character.
-local function set_output_eol(eol)
-  __opts.output_eol = eol
-end
-M.set_output_eol = set_output_eol
 
 
 --- Set output file name.
@@ -102,7 +90,6 @@ M.set_output_line_length = set_output_line_length
 -- @param par  A text paragraph (an array of words).
 local function __write_text_paragraph(f, par)
   local maxlinelength = __opts.output_line_length
-  local eol = __opts.output_eol
   -- Index of first word on current line.  Initialize current line with
   -- first word of paragraph.
   local lstart = 1
@@ -118,14 +105,14 @@ local function __write_text_paragraph(f, par)
     else
       -- Write the current line up to the preceeding word to file (words
       -- separated by spaces and with a trailing newline).
-      f:write(tabconcat(par, ' ', lstart, i-1), eol)
+      f:write(tabconcat(par, ' ', lstart, i-1), '\n')
       -- Initialize new current line.
       lstart = i
       llen = wlen
     end
   end
   -- Write last line of paragraph.
-  f:write(tabconcat(par, ' ', lstart), eol)
+  f:write(tabconcat(par, ' ', lstart), '\n')
 end
 
 
@@ -134,12 +121,11 @@ end
 local function __write_text_document()
   -- Open output file.
   local fname = __opts.output_file_name or (tex.jobname .. '.spell.txt')
-  local f = assert(io.open(fname, 'wb'))
-  local eol = __opts.output_eol
+  local f = assert(io.open(fname, 'w'))
   -- Iterate through document paragraphs.
   for _,par in ipairs(__text_document) do
     -- Separate paragraphs by a blank line.
-    f:write(eol)
+    f:write('\n')
     -- Write paragraph to file.
     __write_text_paragraph(f, par)
     -- Delete paragraph from memory.
@@ -195,12 +181,6 @@ local function __init()
   set_output_file_name(nil)
   -- Set default output line length.
   set_output_line_length(72)
-  -- Set default output EOL character.
-  if (os.type == 'windows') or (os.type == 'msdos') then
-    set_output_eol('\r\n')
-  else
-    set_output_eol('\n')
-  end
   -- Remember call-back status.
   __is_active_output = false
 end

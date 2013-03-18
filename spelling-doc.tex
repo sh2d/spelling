@@ -307,35 +307,6 @@ length.  Note, lines are broken at spaces only.  Words longer than
 maximum line length are put on a single line exceeding maximum line
 length.  Default line length is~72.
 
-\paragraph{Line ending convention} The end-of-line (\acr{eol}) character
-in text output can be configured via command \macro{spellingoutputeol}.
-Argument is an arbitrary sequence of characters in the \acr{utf-8}
-encoding.
-
-Well, things are a bit more complicated, because in Lua\TeX, as in the
-original \TeX, some characters are treated special.  To keep Lua\TeX\
-from messing with our \acr{eol} characters in the input, we need to set
-their category codes accordingly.  As an example, to set \acr{eol}
-character to follow \acr{dos} line ending convention (carriage return
-followed by line feed, \TeX\ notation |^^M^^J|), the following code can
-be used:
-
-\begin{lstlisting}[language={[LaTeX]TeX}]
-\begingroup
-\catcode`\^^J=12% make line feed and carriage return
-\catcode`\^^M=12% of category Other
-\spellingoutputeol{^^M^^J}
-\endgroup
-\end{lstlisting}
-%
-For the \acr{unix} line ending convention (a single line feed), just
-leave out |^^M| in the argument to |\spellingoutputeol|.
-
-Default line ending convention depends on the operating system
-determined by Lua\TeX.  If |os.type| is either |windows| or |msdos|,
-\acr{dos} line ending convention is used.  Otherwise \acr{unix} line
-ending convention is used.
-
 
 \subsection{Text extraction}
 \label{sec:textextraction}

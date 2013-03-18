@@ -98,12 +98,6 @@
     PKG_spelling.stage[4].set_output_line_length('\luaescapestring{#1}')
   }%
 }
-% Provide command for setting text output EOL character.
-\newcommand*{\spellingoutputeol}[1]{%
-  \directlua{
-    PKG_spelling.stage[4].set_output_eol('\luaescapestring{#1}')
-  }%
-}
 % Provide command for enabling/disabling text extraction.
 \newcommand*{\spellingextract}[1]{%
   \ifthenelse{\equal{#1}{on}}{%
