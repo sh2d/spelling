@@ -341,31 +341,45 @@ characters corresponding to their constituting letters.  The default
 mappings applied can be found in \autoref{tab:cp-mapping}.
 
 \begin{table}
-  \centering
+  \begin{minipage}{1.0\linewidth}
+    \centering
 
-  \begin{tabular}{>{\ttfamily}l>{\ttfamily}l>{\ttfamily}l}
-    \normalfont Unicode name & \normalfont code point & \normalfont target characters\\
+    \newcommand*{\coltitle}[2]{%
+      \normalfont%
+      \vbox{
+        \hbox{\strut#1}
+        \hbox{\strut#2}
+      }%
+    }
+
+    \begin{tabular}{>{\ttfamily}l>{\fontspec{Linux Libertine
+            O}}l>{\ttfamily}l>{\ttfamily}l}
+      \normalfont Unicode name & \coltitle{sample}{glyph\footnote{Sample
+          glyphs are taken from font \emph{Linux Libertine~O}.}} &
+      \coltitle{code}{point} & \coltitle{target}{characters}\\
     \addlinespace
     \toprule
     \addlinespace
 
-    LATIN CAPITAL LIGATURE IJ & 0x0132 & IJ\\
-    LATIN SMALL LIGATURE IJ & 0x0133 & ij\\
-    LATIN CAPITAL LIGATURE OE & 0x0152 & OE\\
-    LATIN SMALL LIGATURE OE & 0x0153 & oe\\
-    LATIN SMALL LETTER LONG S & 0x017f & s\\
-    LATIN SMALL LIGATURE FF & 0xfb00 & ff\\
-    LATIN SMALL LIGATURE FI & 0xfb01 & fi\\
-    LATIN SMALL LIGATURE FL & 0xfb02 & fl\\
-    LATIN SMALL LIGATURE FFI & 0xfb03 & ffi\\
-    LATIN SMALL LIGATURE FFL & 0xfb04 & ffl\\
-    LATIN SMALL LIGATURE LONG S T & 0xfb05 & st\\
-    LATIN SMALL LIGATURE ST & 0xfb06 & st\\
+    LATIN CAPITAL LIGATURE IJ     & ^^^^0132 & 0x0132 & IJ  \\
+    LATIN SMALL LIGATURE IJ       & ^^^^0133 & 0x0133 & ij  \\
+    LATIN CAPITAL LIGATURE OE     & ^^^^0152 & 0x0152 & OE  \\
+    LATIN SMALL LIGATURE OE       & ^^^^0153 & 0x0153 & oe  \\
+    LATIN SMALL LETTER LONG S     & ^^^^017f & 0x017f & s   \\
+    \addlinespace
+    LATIN SMALL LIGATURE FF       & ^^^^fb00 & 0xfb00 & ff  \\
+    LATIN SMALL LIGATURE FI       & ^^^^fb01 & 0xfb01 & fi  \\
+    LATIN SMALL LIGATURE FL       & ^^^^fb02 & 0xfb02 & fl  \\
+    LATIN SMALL LIGATURE FFI      & ^^^^fb03 & 0xfb03 & ffi \\
+    LATIN SMALL LIGATURE FFL      & ^^^^fb04 & 0xfb04 & ffl \\
+    LATIN SMALL LIGATURE LONG S T & ^^^^fb05 & 0xfb05 & st  \\
+    LATIN SMALL LIGATURE ST       & ^^^^fb06 & 0xfb06 & st  \\
   \end{tabular}
 
   \caption{Default code point mappings.}
   \label{tab:cp-mapping}
 
+  \end{minipage}
 \end{table}
 
 Additional mappings can be declared by command \macro{spellingmapping}.
