@@ -133,8 +133,6 @@ local __codepoint_map = {
   [0x0153] = 'oe',-- LATIN SMALL LIGATURE OE
   [0x017f] = 's',-- LATIN SMALL LETTER LONG S
 
-  [0x1e9e] = 'SS',-- LATIN CAPITAL LETTER SHARP S
-
   [0xfb00] = 'ff',-- LATIN SMALL LIGATURE FF
   [0xfb01] = 'fi',-- LATIN SMALL LIGATURE FI
   [0xfb02] = 'fl',-- LATIN SMALL LIGATURE FL
