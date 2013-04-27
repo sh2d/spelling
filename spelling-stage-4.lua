@@ -37,6 +37,7 @@ local unicode = require('unicode')
 
 -- Function short-cuts.
 local tabconcat = table.concat
+local tabinsert = table.insert
 
 local Ulen = unicode.utf8.len
 
@@ -88,13 +89,16 @@ end
 M.set_output_line_length = set_output_line_length
 
 
---- Break a paragraph into lines of a fixed length and write the lines
---- to a file.
+--- Break a text paragraph into lines.
+-- Lines are broken at spaces only.  Lines containing only one word may
+-- exceed maximum line length.
 --
--- @param f  A file handle.
 -- @param par  A text paragraph (an array of words).
-local function __write_text_paragraph(f, par)
-  local maxlinelength = __opts.output_line_length
+-- @param max_line_len Maximum length of lines in wrapped paragraph.  If
+-- the argument is less then 1, paragraph isn't wrapped at all.
+-- @return Table containing the lines of the paragraph.
+local function __wrap_text_paragraph(par, maxlinelength)
+  local wrapped_par = {}
   -- Index of first word on current line.  Initialize current line with
   -- first word of paragraph.
   local lstart = 1
@@ -108,16 +112,16 @@ local function __write_text_paragraph(f, par)
       -- Append word to current line.
       llen = llen + 1 + wlen
     else
-      -- Write the current line up to the preceeding word to file (words
-      -- separated by spaces and with a trailing newline).
-      f:write(tabconcat(par, ' ', lstart, i-1), '\n')
+      -- Insert current line into wrapped paragraph.
+      tabinsert(wrapped_par, tabconcat(par, ' ', lstart, i-1))
       -- Initialize new current line.
       lstart = i
       llen = wlen
     end
   end
-  -- Write last line of paragraph.
-  f:write(tabconcat(par, ' ', lstart), '\n')
+  -- Insert last line of paragraph.
+  tabinsert(wrapped_par, tabconcat(par, ' ', lstart))
+  return wrapped_par
 end
 
 
@@ -127,12 +131,11 @@ local function __write_text_document()
   -- Open output file.
   local fname = __opts.output_file_name or (tex.jobname .. '.spell.txt')
   local f = assert(io.open(fname, 'w'))
+  local max_line_len = __opts.output_line_length
   -- Iterate through document paragraphs.
   for _,par in ipairs(__text_document) do
-    -- Separate paragraphs by a blank line.
-    f:write('\n')
-    -- Write paragraph to file.
-    __write_text_paragraph(f, par)
+    -- Write wrapped paragraph to file with a leading empty line.
+    f:write('\n', tabconcat(__wrap_text_paragraph(par, max_line_len), '\n'), '\n')
     -- Delete paragraph from memory.
     __text_document[_] = nil
   end
