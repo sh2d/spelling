@@ -31,6 +31,10 @@ module(...)
 local M = {}
 
 
+-- Import external modules.
+local unicode = require('unicode')
+
+
 -- Function short-cuts.
 local tabconcat = table.concat
 local utf8len = unicode.utf8.len

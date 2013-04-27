@@ -33,9 +33,9 @@ module(...)
 local M = {}
 
 
--- Import helper module.
-local __recurse = require 'spelling-recurse'
-local __recurse_node_list = __recurse.recurse_node_list
+-- Import external modules.
+local recurse = require('spelling-recurse')
+local unicode = require('unicode')
 
 
 -- Function short-cuts.
@@ -43,9 +43,13 @@ local tabconcat = table.concat
 local tabinsert = table.insert
 local tabremove = table.remove
 local utf8char = unicode.utf8.char
+
+
 local node_new = node.new
 local node_insert_after = node.insert_after
 local node_insert_before = node.insert_before
+
+local recurse_node_list = recurse.recurse_node_list
 
 
 -- Short-cuts for constants.
@@ -460,7 +464,7 @@ local function __process_node_list(head)
   __curr_word_start = nil
   __curr_word_end_head = nil
   __curr_word_end = nil
-  __recurse_node_list(head, __cb_tag_words)
+  recurse_node_list(head, __cb_tag_words)
   -- Clean-up left-over word and/or paragraph.
   __finish_current_paragraph()
 end

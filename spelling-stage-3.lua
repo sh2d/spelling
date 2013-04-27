@@ -37,12 +37,13 @@ module(...)
 local M = {}
 
 
--- Import helper module.
-local __recurse = require 'spelling-recurse'
-local __recurse_node_list = __recurse.recurse_node_list
+-- Import external modules.
+local recurse = require('spelling-recurse')
 
 
 -- Function short-cuts.
+local recurse_node_list = recurse.recurse_node_list
+
 local tabinsert = table.insert
 local tabremove = table.remove
 
@@ -235,7 +236,7 @@ local __cb_store_words = {
 --
 -- @param head  Node list.
 local function __process_node_list(head)
-  __recurse_node_list(head, __cb_store_words)
+  recurse_node_list(head, __cb_store_words)
   -- Clean-up left-over word and/or paragraph.
   __finish_current_paragraph()
 end

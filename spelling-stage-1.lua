@@ -28,7 +28,8 @@ module(...)
 local M = {}
 
 
--- Load LuaXML module.
+-- Import external modules.
+local unicode = require('unicode')
 local xml = require('luaxml-mod-xml')
 
 
