@@ -454,7 +454,7 @@ them to highlight bad spellings.%
 \label{sec:lt-installation}
 
 Here are some brief installation instructions for the stand-alone
-version of LanguageTool (tested with LanguageTool~2.0).  The stand-alone
+version of LanguageTool (tested with LanguageTool~2.1).  The stand-alone
 version contains a \acr{gui} as well as a command-line interface.  For
 the \pkg\ package, the latter is needed.
 
@@ -478,10 +478,10 @@ java -version
 \item Uncompress the downloaded archive to a location of your choice.
 
 \item Open a command-line in the directory containing file
-  |LanguageTool.jar| and type
+  |languagetool-commandline.jar| and type
 
 \begin{lstlisting}[escapeinside=°°]
-°\descr{path to}°/java -jar LanguageTool.jar --help
+°\descr{path to}°/java -jar languagetool-commandline.jar --help
 \end{lstlisting}
 %
   Prepending the path to the Java executable is optional, depending on
@@ -497,13 +497,13 @@ java -version
 
 \begin{lstlisting}[escapeinside=°°]
 #!/bin/sh
-°\descr{path to}°/java -jar °\descr{path to}°/LanguageTool.jar $*
+°\descr{path to}°/java -jar °\descr{path to}°/languagetool-commandline.jar $*
 \end{lstlisting}
 %
     where \texttt{\descr{path to}} should point to the Java executable
-    (optional) and file |LanguageTool.jar| (mandatory).  If the script
-    is named |lt.sh|, you should be able to run LanguageTool on the
-    command shell by typing, \lpeg,
+    (optional) and file |languagetool-commandline.jar| (mandatory).  If
+    the script is named |lt.sh|, you should be able to run LanguageTool
+    on the command shell by typing, \lpeg,
 
 \begin{lstlisting}
 sh lt.sh --version
@@ -517,13 +517,13 @@ sh lt.sh --version
 
 \begin{lstlisting}[escapeinside=°°]
 @echo off
-°\descr{path to}°\java -jar °\descr{path to}°\LanguageTool.jar %*
+°\descr{path to}°\java -jar °\descr{path to}°\languagetool-commandline.jar %*
 \end{lstlisting}
 %
     where \texttt{\descr{path to}} should point to the Java executable
-    (optional) and file |LanguageTool.jar| (mandatory).  If the script
-    is named |lt.bat|, you should be able to run LanguageTool on the
-    command-line by typing, \lpeg,
+    (optional) and file |languagetool-commandline.jar| (mandatory).  If
+    the script is named |lt.bat|, you should be able to run LanguageTool
+    on the command-line by typing, \lpeg,
 
 \begin{lstlisting}
 lt --version
