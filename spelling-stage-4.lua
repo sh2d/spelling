@@ -97,30 +97,30 @@ M.set_output_line_length = set_output_line_length
 -- @param max_line_len Maximum length of lines in wrapped paragraph.  If
 -- the argument is less then 1, paragraph isn't wrapped at all.
 -- @return Table containing the lines of the paragraph.
-local function __wrap_text_paragraph(par, maxlinelength)
+local function __wrap_text_paragraph(par, max_line_len)
   local wrapped_par = {}
   -- Index of first word on current line.  Initialize current line with
   -- first word of paragraph.
-  local lstart = 1
+  local line_start = 1
   -- Track current line length.
-  local llen = Ulen(par[1])
+  local line_len = Ulen(par[1])
   -- Iterate over remaining words in paragraph.
   for i = 2,#par do
-    local wlen = Ulen(par[i])
+    local word_len = Ulen(par[i])
     -- Does word fit onto current line?
-    if (llen + 1 + wlen <= maxlinelength) or (maxlinelength < 1) then
+    if (line_len + 1 + word_len <= max_line_len) or (max_line_len < 1) then
       -- Append word to current line.
-      llen = llen + 1 + wlen
+      line_len = line_len + 1 + word_len
     else
       -- Insert current line into wrapped paragraph.
-      tabinsert(wrapped_par, tabconcat(par, ' ', lstart, i-1))
+      tabinsert(wrapped_par, tabconcat(par, ' ', line_start, i-1))
       -- Initialize new current line.
-      lstart = i
-      llen = wlen
+      line_start = i
+      line_len = word_len
     end
   end
   -- Insert last line of paragraph.
-  tabinsert(wrapped_par, tabconcat(par, ' ', lstart))
+  tabinsert(wrapped_par, tabconcat(par, ' ', line_start))
   return wrapped_par
 end
 
