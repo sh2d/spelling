@@ -103,21 +103,21 @@ local function __wrap_text_paragraph(par, max_line_len)
   -- first word of paragraph.
   local line_start = 1
   -- Track current line length.
-  local line_len = Ulen(par[1])
+  local line_len = Ulen(par[line_start])
   -- Iterate over remaining words in paragraph.
   for i = 2,#par do
     local word_len = Ulen(par[i])
-    -- Does word fit onto current line?
-    if (line_len + 1 + word_len <= max_line_len) or (max_line_len < 1) then
-      -- Append word to current line.
-      line_len = line_len + 1 + word_len
-    else
+    local new_line_len = line_len + 1 + word_len
+    -- Maximum line length exceeded?
+    if new_line_len > max_line_len and max_line_len >= 1 then
       -- Insert current line into wrapped paragraph.
       tabinsert(wrapped_par, tabconcat(par, ' ', line_start, i-1))
       -- Initialize new current line.
       line_start = i
-      line_len = word_len
+      new_line_len = word_len
     end
+    -- Append word to current line.
+    line_len = new_line_len
   end
   -- Insert last line of paragraph.
   tabinsert(wrapped_par, tabconcat(par, ' ', line_start))
