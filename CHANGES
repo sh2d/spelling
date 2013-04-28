@@ -12,6 +12,10 @@ Changes:
 
 * Improved compatibility with recent LuaTeX versions (v0.74 and newer).
 
+Fixes:
+
+* Macro `\spellingoutputlinelength` was broken.
+
 
 ### v0.3 (2013-02-12)
 
