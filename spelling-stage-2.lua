@@ -54,6 +54,7 @@ local Sgmatch = string.gmatch
 local Smatch = string.match
 
 local Uchar = unicode.utf8.char
+local Umatch = unicode.utf8.match
 
 
 -- Short-cuts for constants.
@@ -142,22 +143,26 @@ local __is_highlighting_needed = {}
 
 
 --- Calculate and cache the highlighting status of a string.
--- Highlighting of a string is required, if it matches a known bad
--- spelling, but not a known good spelling.  That is, known good
--- spellings take precedence over known bad spellings.
+-- First, surrounding punctuation is stripped from the string argument.
+-- Highlighting of the string is required, if either one, the original
+-- or the stripped string, matches a known bad spelling, but not a known
+-- good spelling.  That is, known good spellings take precedence over
+-- known bad spellings.
 --
 -- @param t  Original table.
--- @param s  String to check.
+-- @param raw  Raw string to check.
 -- @return True, if highlighting is required.  False, otherwise.
-local function __calc_is_highlighting_needed(t, s)
+local function __calc_is_highlighting_needed(t, raw)
+  -- Strip surrounding punctuation from string.
+  local stripped = Umatch(raw, '^%p*(.-)%p*$')
   -- Check for a bad match.
-  local is_bad = __is_bad[s]
+  local is_bad = __is_bad[stripped] or __is_bad[raw]
   -- Check for a good match.
-  local is_good = __is_good[s]
+  local is_good = __is_good[stripped] or __is_good[raw]
   -- Calculate highlighting status.
   local status = (is_bad and not is_good) or false
   -- Store status in cache table.
-  rawset(t, s, status)
+  rawset(t, raw, status)
   -- Return status.
   return status
 end

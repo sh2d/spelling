@@ -17,11 +17,19 @@ Changes:
 
 Fixes:
 
+* Bad words with surrounding punctuation haven't been highlighted.
+  Determining whether a word needs to be highlighted is now done by
+  checking against the lists of bad and good spellings words as they
+  appear in the document with possible punctuation as well as with all
+  surrounding punctuation stripped ([GitHub issue 8][ghi#8]).
+
 * Macro `\spellingoutputlinelength` was broken.
 
 * Raising an error when a file cannot be opened for reading causes
   problems when compiling a document for the first time.  Now, only a
   warning is written to the console and log file in that case.
+
+[ghi#8]: https://github.com/sh2d/spelling/issues/8
 
 
 ### v0.3 (2013-02-12)

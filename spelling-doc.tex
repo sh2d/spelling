@@ -89,9 +89,7 @@ basicstyle=\ttfamily,
 \label{sec:intro}
 
 Ther%
-\footnote{A fotenoot containing misspelllings.  But note how
-  `misspelllings' currently slips through due to punctuation.  Some
-  annoying bugs are listed in \autoref{sec:bugs}.}
+\footnote{A footnote containing mispellings.}
 %
 are three main approaches to spell-checking \TeX\ documents:
 
@@ -626,12 +624,6 @@ The most user-visible issues are listed below:
 
   \item Text in head and foot lines is neither extracted nor highlighted
     (\href{https://github.com/sh2d/spelling/issues/7}{issue~7}).
-
-  \item Punctuation characters are currently not stripped from words.
-    For that reason, misspellings of words with leading or trailing
-    punctuation will currently slip through.  This affects at least one
-    word per sentence, the last one
-    (\href{https://github.com/sh2d/spelling/issues/8}{issue~8}).
 
   \item The first word starting right after an |hlist|, \lpeg, the first
     word within an |\mbox|, is never highlighted.  It is extracted and
