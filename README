@@ -36,8 +36,8 @@ generated via
     luadoc -d API *.lua
 
 Bugs and a wish list can be found in the
-[issue tracker](https://github.com/sh2d/spelling/issues/).
-Contributions of any kind are warmly welcome!
+[issue tracker](https://github.com/sh2d/spelling/issues/).  Patches
+welcome!
 
 
 _Happy TeXing!_
