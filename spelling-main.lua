@@ -1,4 +1,4 @@
---- spelling.lua
+--- spelling-main.lua
 --- Copyright 2012, 2013 Stephan Hennig
 --
 -- This work may be distributed and/or modified under the conditions of

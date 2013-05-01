@@ -26,7 +26,7 @@
 \directlua name {spelling}{
   % The main Lua file is not a module, so we must pass a full path to
   % `dofile`.
-  local f = kpse.find_file('spelling.lua', 'lua')
+  local f = kpse.find_file('spelling-main.lua', 'lua')
   dofile(f)
 }
 % Words are extracted after pages have been built.  In lack of a proper

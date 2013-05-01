@@ -49,10 +49,10 @@ _Happy TeXing!_
     CHANGES
     LICENSE
     README
-    spelling.lua
     spelling.sty
     spelling-doc.bad
     spelling-doc.tex
+    spelling-main.lua
     spelling-recurse.lua
     spelling-stage-1.lua
     spelling-stage-2.lua
