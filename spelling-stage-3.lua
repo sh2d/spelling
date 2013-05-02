@@ -280,7 +280,7 @@ M.disable_text_storage = disable_text_storage
 local function __init()
   -- Get local references to package ressources.
   __text_document = PKG_spelling.res.text_document
-  __whatsit_uid = PKG_spelling.res.whatsit_uid
+  __whatsit_uid = PKG_spelling.res.whatsit_ids.word_tag
   -- Make \AtBeginShipout function available in package table.
   PKG_spelling.cb_AtBeginShipout = cb_AtBeginShipout
   -- Create empty paragraph management stack.

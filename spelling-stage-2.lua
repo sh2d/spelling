@@ -651,7 +651,7 @@ local function __init()
   -- Get local references to package ressources.
   __rules_bad = PKG_spelling.res.rules_bad
   __rules_good = PKG_spelling.res.rules_good
-  __whatsit_uid = PKG_spelling.res.whatsit_uid
+  __whatsit_uid = PKG_spelling.res.whatsit_ids.word_tag
   -- Create empty paragraph management stack.
   __is_vlist_paragraph = {}
   -- Remember tagging status.

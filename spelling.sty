@@ -20,7 +20,8 @@
 \PackageError{spelling}{LuaTeX engine required}{You could try with the
   `lualatex' command.}
 \fi
-\RequirePackage{luatexbase}
+% User-defined whatsit node ID allocation.
+\RequirePackage{luatexbase-attr}
 % Load main Lua file.
 \directlua name {spelling}{
   % The main Lua file is not a module, so we must pass a full path to

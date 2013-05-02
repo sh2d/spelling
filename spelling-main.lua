@@ -133,7 +133,7 @@ local res = {
   rules_bad,
   rules_good,
   text_document,
-  whatsit_uid,
+  whatsit_ids,
 
 }
 
@@ -147,6 +147,25 @@ local res = {
 PKG_spelling = {}
 
 
+--- Determine unique IDs for user-defined whatsit nodes used by this
+-- package.  Package luatexbase provides user-defined whatsit node ID
+-- allocation since version v0.6 (TL 2013).  For older package versions,
+-- we start allocating at an arbitrary hard-coded value of 35**8
+-- (ca. 2**41).
+--
+-- @return Table mapping names to IDs.
+local function __allocate_whatsit_ids()
+  local ids = {}
+  -- Allocation support present?
+  if luatexbase.new_user_whatsit_id then
+    ids.word_tag = luatexbase.new_user_whatsit_id('word_tag', 'spelling')
+  else
+    ids.word_tag = 35^8
+  end
+  return ids
+end
+
+
 --- Package initialisation.
 --
 local function __init()
@@ -154,7 +173,7 @@ local function __init()
   res.rules_bad = {}
   res.rules_good = {}
   res.text_document = {}
-  res.whatsit_uid = 163
+  res.whatsit_ids = __allocate_whatsit_ids()
   -- Provide global access to package ressources during module loading.
   PKG_spelling.res = res
   -- Load sub-modules:
