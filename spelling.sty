@@ -55,6 +55,13 @@
     PKG_spelling.stage[1].parse_XML_LanguageTool_file('\luaescapestring{#1}')
   }%
 }
+% Provide command for reading match rules from a file.  Argument must be
+% a file name.
+\newcommand*{\spellingmatchrules}[1]{%
+  \directlua{
+    PKG_spelling.stage[1].read_match_rules('\luaescapestring{#1}')
+  }%
+}
 % Provide command for enabling/disabling visual feedback.
 \newcommand*{\spellinghighlight}[1]{%
   \directlua{

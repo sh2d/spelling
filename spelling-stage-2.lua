@@ -70,11 +70,11 @@ local PDF_COLORSTACK = node.subtype('pdf_colorstack')
 -- Declare local variables to store references to resources that are
 -- provided by external code.
 --
--- Table of known bad spellings.
-local __is_bad
+-- Table of bad rules.
+local __rules_bad
 --
--- Table of known good spellings.
-local __is_good
+-- Table of good rules.
+local __rules_good
 --
 -- ID of user-defined whatsit nodes.
 local __whatsit_uid
@@ -144,10 +144,10 @@ local __is_highlighting_needed = {}
 
 --- Calculate and cache the highlighting status of a string.
 -- First, surrounding punctuation is stripped from the string argument.
--- Highlighting of the string is required, if either one, the original
--- or the stripped string, matches a known bad spelling, but not a known
--- good spelling.  That is, known good spellings take precedence over
--- known bad spellings.
+-- Then, the given raw as well as the stripped string are checked
+-- against all rules.  Highlighting of the string is required, if any
+-- bad rule matches, but no good rule matches.  That is, good rules take
+-- precedence over bad rules.
 --
 -- @param t  Original table.
 -- @param raw  Raw string to check.
@@ -156,9 +156,17 @@ local function __calc_is_highlighting_needed(t, raw)
   -- Strip surrounding punctuation from string.
   local stripped = Umatch(raw, '^%p*(.-)%p*$')
   -- Check for a bad match.
-  local is_bad = __is_bad[stripped] or __is_bad[raw]
+  local is_bad = false
+  for _,matches_bad in ipairs(__rules_bad) do
+    is_bad = is_bad or matches_bad(raw, stripped)
+    if is_bad then break end
+  end
   -- Check for a good match.
-  local is_good = __is_good[stripped] or __is_good[raw]
+  local is_good = false
+  for _,matches_good in ipairs(__rules_good) do
+    is_good = is_good or matches_good(raw, stripped)
+    if is_good then break end
+  end
   -- Calculate highlighting status.
   local status = (is_bad and not is_good) or false
   -- Store status in cache table.
@@ -641,8 +649,8 @@ local function __init()
   -- Try to maintain compatibility with older LuaTeX versions.
   __maintain_compatibility()
   -- Get local references to package ressources.
-  __is_bad = PKG_spelling.res.is_bad
-  __is_good = PKG_spelling.res.is_good
+  __rules_bad = PKG_spelling.res.rules_bad
+  __rules_good = PKG_spelling.res.rules_good
   __whatsit_uid = PKG_spelling.res.whatsit_uid
   -- Create empty paragraph management stack.
   __is_vlist_paragraph = {}

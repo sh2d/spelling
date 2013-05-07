@@ -30,6 +30,7 @@
 --   <dd><ul>
 --     <li>Load bad strings.</li>
 --     <li>Load good strings.</li>
+--     <li>Handle match rules.</li>
 --   </ul></dd>
 --
 -- <dt>Stage 2  (call-back <code>pre_linebreak_filter</code>)</dt>
@@ -80,15 +81,15 @@ stage = {}
 -- @class table
 -- @name res
 --
--- @field is_bad  Table.<br />
+-- @field rules_bad  Table.<br />
 --
--- This table maps all strings known as bad spellings to the value
--- `true`.
+-- This table contains all bad rules.  Spellings can be matched against
+-- these rules.
 --
--- @field is_good  Table.<br />
+-- @field rules_good  Table.<br />
 --
--- This table maps all strings known as good spellings to the value
--- `true`.
+-- This table contains all good match rules.  Spellings can be matched
+-- against these rules.
 --
 -- @field text_document  Table.<br />
 --
@@ -129,8 +130,8 @@ stage = {}
 --
 local res = {
 
-  is_bad,
-  is_good,
+  rules_bad,
+  rules_good,
   text_document,
   whatsit_uid,
 
@@ -150,14 +151,15 @@ PKG_spelling = {}
 --
 local function __init()
   -- Create resources.
-  res.is_bad = {}
-  res.is_good = {}
+  res.rules_bad = {}
+  res.rules_good = {}
   res.text_document = {}
   res.whatsit_uid = 163
   -- Provide global access to package ressources during module loading.
   PKG_spelling.res = res
   -- Load sub-modules:
   -- * bad and good string loading
+  -- * match rule handling
   stage[1] = require 'spelling-stage-1'
   -- * node list tagging
   -- * spell-checking

@@ -4,6 +4,11 @@ This material is subject to the LaTeX Project Public License. See
 
 ### v0.4 (xxxx-xx-xx)
 
+New features:
+
+* In addition to lists of bad and good spellings, words can be checked
+  against user-defined match rules to determine highlighting status.
+
 Changes:
 
 * Removed means to configure EOL character of text output file.

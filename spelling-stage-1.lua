@@ -12,7 +12,7 @@
 --
 
 
---- Parse sources of bad and good strings.
+--- Handle lists of bad and good strings and match rules.
 --
 -- @author Stephan Hennig
 -- @copyright 2012, 2013 Stephan Hennig
@@ -34,6 +34,10 @@ local xml = require('luaxml-mod-xml')
 
 
 -- Function short-cuts.
+local Sfind = string.find
+
+local tabinsert = table.insert
+
 local Ufind = unicode.utf8.find
 local Ugmatch = unicode.utf8.gmatch
 local Usub = unicode.utf8.sub
@@ -47,6 +51,12 @@ local __is_bad
 --
 -- Table of known good strings.
 local __is_good
+--
+-- Table of bad rules.
+local __rules_bad
+--
+-- Table of good rules.
+local __rules_good
 
 
 --- Generic function for reading bad or good spellings from a file.
@@ -278,12 +288,77 @@ end
 M.parse_default_bad_and_good = parse_default_bad_and_good
 
 
+--- Default bad dictionary look-up match rule.
+-- This function looks-up both arguments in the list of bad spellings.
+-- It returns `true` if either of the arguments is found in the list of
+-- bad spellings, otherwise `false`.
+--
+-- @param raw  Raw string to check.
+-- @param stripped  Same as `raw`, but with stripped surrounding
+-- punctuation.
+-- @return A boolean value indicating a match.
+local function __bad_rule_bad_dictionary_lookup(raw, stripped)
+  return __is_bad[stripped] or __is_bad[raw]
+end
+
+
+--- Default good dictionary look-up match rule.
+-- This function looks-up both arguments in the list of good spellings.
+-- It returns `true` if either of the arguments is found in the list of
+-- good spellings, otherwise `false`.
+--
+-- @param raw  Raw string to check.
+-- @param stripped  Same as `raw`, but with stripped surrounding
+-- punctuation.
+-- @return A boolean value indicating a match.
+local function __good_rule_good_dictionary_lookup(raw, stripped)
+  return __is_good[stripped] or __is_good[raw]
+end
+
+
+--- Load match rule module.
+-- Match rule modules are loaded using `require`.  The module table must
+-- follow the following convention: Indentifiers of bad match rules
+-- start `bad_rule_`.  Indentifiers of good match rules start
+-- `good_rule_`.  Other and non-function identifiers are ignore.
+--
+-- All match rules found in a module are added to the table of bad and
+-- good match rules.  Arguments of a match rule function are a raw
+-- string and the same string with stripped surrounding punctuation.
+--
+-- @param fname  Module file name.
+local function read_match_rules(fname)
+  local bad_c = 0
+  local good_c = 0
+  local rules = require(fname)
+  for k,v in pairs(rules) do
+    if type(v) == 'function' then
+      if Sfind(k, '^bad_rule_') then
+        tabinsert(__rules_bad, v)
+        bad_c = bad_c + 1
+      elseif Sfind(k, '^good_rule_') then
+        tabinsert(__rules_good, v)
+        good_c = good_c + 1
+      end
+    end
+  end
+  texio.write_nl('package spelling: Info! ' .. bad_c .. '/' .. good_c .. ' bad/good match rules read from module \'' .. fname .. '\'.')
+end
+M.read_match_rules = read_match_rules
+
+
 --- Module initialisation.
 --
 local function __init()
   -- Get local references to package ressources.
-  __is_bad = PKG_spelling.res.is_bad
-  __is_good = PKG_spelling.res.is_good
+  __rules_bad = PKG_spelling.res.rules_bad
+  __rules_good = PKG_spelling.res.rules_good
+  -- Add default dictionary look-up match rules.
+  tabinsert(__rules_bad, __bad_rule_bad_dictionary_lookup)
+  tabinsert(__rules_good, __good_rule_good_dictionary_lookup)
+  -- Create emtpy lists of known spellings.
+  __is_bad = {}
+  __is_good = {}
 end
 
 
