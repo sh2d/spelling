@@ -126,6 +126,49 @@ end
 M.set_highlight_color = set_highlight_color
 
 
+--- Highlighting status cache table.
+-- Determining the highlighting status of a string can be an expensive
+-- operation.  To reduce average run-time penalty per string,
+-- highlighting status of all strings found in a document is cached in
+-- this table, so that determining the highlighting status of a known
+-- string requires only one table look-up.<br />
+--
+-- This table needs an `__index` meta method calculating the
+-- highlighting status of unknown keys (strings).
+--
+-- @class table
+-- @name __is_highlighting_needed
+local __is_highlighting_needed = {}
+
+
+--- Calculate and cache the highlighting status of a string.
+-- Highlighting of a string is required, if it matches a known bad
+-- spelling, but not a known good spelling.  That is, known good
+-- spellings take precedence over known bad spellings.
+--
+-- @param t  Original table.
+-- @param s  String to check.
+-- @return True, if highlighting is required.  False, otherwise.
+local function __calc_is_highlighting_needed(t, s)
+  -- Check for a bad match.
+  local is_bad = __is_bad[s]
+  -- Check for a good match.
+  local is_good = __is_good[s]
+  -- Calculate highlighting status.
+  local status = (is_bad and not is_good) or false
+  -- Store status in cache table.
+  rawset(t, s, status)
+  -- Return status.
+  return status
+end
+
+
+-- Set-up meta table for highlighting status cache table.
+setmetatable(__is_highlighting_needed, {
+  __index = __calc_is_highlighting_needed,
+})
+
+
 --- Convert a Unicode code point to a regular UTF-8 encoded string.
 -- This function can be used as an `__index` meta method.
 --
@@ -388,8 +431,8 @@ local function __finish_current_word()
     if __is_active_tagging then
       __tag_word(word)
     end
-    -- Test for bad spelling.
-    if __is_active_highlighting and __is_bad[word] and not __is_good[word] then
+    -- Highlighting needed?
+    if __is_highlighting_needed[word] and __is_active_highlighting then
       __highlight_bad_word()
     end
     __curr_word = nil
