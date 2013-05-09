@@ -37,7 +37,8 @@ local unicode = require('unicode')
 
 -- Function short-cuts.
 local tabconcat = table.concat
-local utf8len = unicode.utf8.len
+
+local Ulen = unicode.utf8.len
 
 
 -- Declare local variables to store references to resources that are
@@ -98,10 +99,10 @@ local function __write_text_paragraph(f, par)
   -- first word of paragraph.
   local lstart = 1
   -- Track current line length.
-  local llen = utf8len(par[1])
+  local llen = Ulen(par[1])
   -- Iterate over remaining words in paragraph.
   for i = 2,#par do
-    local wlen = utf8len(par[i])
+    local wlen = Ulen(par[i])
     -- Does word fit onto current line?
     if (llen + 1 + wlen <= maxlinelength) or (maxlinelength < 1) then
       -- Append word to current line.

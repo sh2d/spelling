@@ -42,14 +42,14 @@ local unicode = require('unicode')
 local tabconcat = table.concat
 local tabinsert = table.insert
 local tabremove = table.remove
-local utf8char = unicode.utf8.char
-
 
 local node_new = node.new
 local node_insert_after = node.insert_after
 local node_insert_before = node.insert_before
 
 local recurse_node_list = recurse.recurse_node_list
+
+local Uchar = unicode.utf8.char
 
 
 -- Short-cuts for constants.
@@ -108,7 +108,7 @@ M.set_highlight_color = set_highlight_color
 -- @param cp  originl key, a Unicode code point
 -- @return UTF-8 encoded string corresponding to the Unicode code point.
 local function __meta_cp2utf8(t, cp)
-  return utf8char(cp)
+  return Uchar(cp)
 end
 
 

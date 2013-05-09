@@ -34,6 +34,9 @@ local xml = require('luaxml-mod-xml')
 
 
 -- Function short-cuts.
+local Ufind = unicode.utf8.find
+local Ugmatch = unicode.utf8.gmatch
+local Usub = unicode.utf8.sub
 
 
 -- Declare local variables to store references to resources that are
@@ -66,7 +69,7 @@ local function __parse_plain_list_file(fname, t)
   local total_c = 0
   local new_c = 0
   -- Iterate line-wise through file.
-  for l in s:gmatch('[^\r\n]+') do
+  for l in Ugmatch(s, '[^\r\n]+') do
     -- Map string to boolean value `true`.
     if not t[l] then
       t[l] = true
@@ -160,10 +163,10 @@ local function __parse_XML_LanguageTool(s)
         if ruleid == 'HUNSPELL_RULE'
           or ruleid == 'HUNSPELL_NO_SUGGEST_RULE'
           or ruleid == 'GERMAN_SPELLER_RULE'
-          or string.find(ruleid, '^MORFOLOGIK_RULE_')
+          or Ufind(ruleid, '^MORFOLOGIK_RULE_')
         then
           -- Extract misspelled word from context attribute.
-          local word = unicode.utf8.sub(attr.context, attr.contextoffset + 1, attr.contextoffset + attr.errorlength)
+          local word = Usub(attr.context, attr.contextoffset + 1, attr.contextoffset + attr.errorlength)
           if not __is_bad[word] then
             __is_bad[word] = true
             new_c = new_c + 1
