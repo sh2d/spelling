@@ -76,8 +76,11 @@ local __rules_bad
 -- Table of good rules.
 local __rules_good
 --
--- ID of user-defined whatsit nodes.
-local __whatsit_uid
+-- ID of user-defined whatsit nodes marking the start of a word.
+local __uid_start_tag
+--
+-- ID of user-defined whatsit nodes marking the end of a word.
+local __uid_end_tag
 
 
 --- Module options.
@@ -320,7 +323,7 @@ local function __tag_word(word)
     local start_tag = node_new(WHATSIT, USER_DEFINED)
     -- Mark whatsit node with module ID, so that we can recognize it
     -- later.
-    start_tag.user_id = __whatsit_uid
+    start_tag.user_id = __uid_start_tag
     -- Value is an empty string.
     start_tag.type = 115
     start_tag.value = ''
@@ -331,7 +334,7 @@ local function __tag_word(word)
   local end_tag = node_new(WHATSIT, USER_DEFINED)
   -- Mark whatsit node with module ID, so that we can recognize it
   -- later.
-  end_tag.user_id = __whatsit_uid
+  end_tag.user_id = __uid_end_tag
   -- Value of end tag is an index (a number).
   end_tag.type = 115
   end_tag.value = word
@@ -425,13 +428,10 @@ local function __finish_current_word()
     if start_prev and end_next
     and (start_prev.id == WHATSIT)
     and (start_prev.subtype == USER_DEFINED)
-    and (start_prev.user_id == __whatsit_uid)
-    and (start_prev.type == 115)
-    and (start_prev.value == '')
+    and (start_prev.user_id == __uid_start_tag)
     and (end_next.id == WHATSIT)
     and (end_next.subtype == USER_DEFINED)
-    and (end_next.user_id == __whatsit_uid)
-    and (end_next.type == 115)
+    and (end_next.user_id == __uid_end_tag)
     and (end_next.value == word) then
       __curr_word = nil
       __curr_word_start_head = nil
@@ -651,7 +651,8 @@ local function __init()
   -- Get local references to package ressources.
   __rules_bad = PKG_spelling.res.rules_bad
   __rules_good = PKG_spelling.res.rules_good
-  __whatsit_uid = PKG_spelling.res.whatsit_ids.word_tag
+  __uid_start_tag = PKG_spelling.res.whatsit_ids.start_tag
+  __uid_end_tag = PKG_spelling.res.whatsit_ids.end_tag
   -- Create empty paragraph management stack.
   __is_vlist_paragraph = {}
   -- Remember tagging status.

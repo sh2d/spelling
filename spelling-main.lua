@@ -158,9 +158,12 @@ local function __allocate_whatsit_ids()
   local ids = {}
   -- Allocation support present?
   if luatexbase.new_user_whatsit_id then
-    ids.word_tag = luatexbase.new_user_whatsit_id('word_tag', 'spelling')
+    ids.start_tag = luatexbase.new_user_whatsit_id('start_tag', 'spelling')
+    ids.end_tag = luatexbase.new_user_whatsit_id('end_tag', 'spelling')
   else
-    ids.word_tag = 35^8
+    local uid = 35^8
+    ids.start_tag = uid + 1
+    ids.end_tag = uid + 2
   end
   return ids
 end

@@ -60,8 +60,11 @@ local USER_DEFINED = node.subtype('user_defined')
 -- Text document data structure.
 local __text_document
 --
--- ID of user-defined whatsit nodes.
-local __whatsit_uid
+-- ID of user-defined whatsit nodes marking the start of a word.
+local __uid_start_tag
+--
+-- ID of user-defined whatsit nodes marking the end of a word.
+local __uid_end_tag
 
 
 --- Module options.
@@ -188,11 +191,8 @@ local function __visit_node(head, n)
   -- Test for node containing a word string.
   if nid == WHATSIT then
     -- Test for word string tag.
-    if (n.subtype == USER_DEFINED) and (n.user_id == __whatsit_uid) then
-      -- End tag?
-      if n.value ~= '' then
-        __finish_current_word(n)
-      end
+    if (n.subtype == USER_DEFINED) and (n.user_id == __uid_end_tag) then
+      __finish_current_word(n)
     -- Test for paragraph start.
     elseif n.subtype == LOCAL_PAR then
       __finish_current_paragraph()
@@ -280,7 +280,8 @@ M.disable_text_storage = disable_text_storage
 local function __init()
   -- Get local references to package ressources.
   __text_document = PKG_spelling.res.text_document
-  __whatsit_uid = PKG_spelling.res.whatsit_ids.word_tag
+  __uid_start_tag = PKG_spelling.res.whatsit_ids.start_tag
+  __uid_end_tag = PKG_spelling.res.whatsit_ids.end_tag
   -- Make \AtBeginShipout function available in package table.
   PKG_spelling.cb_AtBeginShipout = cb_AtBeginShipout
   -- Create empty paragraph management stack.
