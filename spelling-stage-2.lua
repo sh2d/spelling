@@ -49,6 +49,10 @@ local node_insert_before = node.insert_before
 
 local recurse_node_list = recurse.recurse_node_list
 
+local Sfind = string.find
+local Sgmatch = string.gmatch
+local Smatch = string.match
+
 local Uchar = unicode.utf8.char
 
 
@@ -89,14 +93,35 @@ local __opts = {
 
 
 --- Set colour used for highlighting.
--- Set colourused for highlighting bad spellings in PDF output.
+-- Set colour used for highlighting bad spellings in PDF output.  The
+-- argument is checked for a valid PDF colour statement.  As an example,
+-- the string `1 0 0 rg` represents a red colour in the RGB colour
+-- space.  A similar colour in the CMYK colour space would be
+-- represented by the string '0 1 1 0 k'.
 --
--- @param col New colour.  This must be a colour statement in PDF format
--- given as string.  As an example, the string `1 0 0 rg` represents a
--- red colour in the RGB colour space.  A similar colour in the CMYK
--- colour space would be represented by the string '0 1 1 0 k'.
+-- @param col  New colour.
 local function set_highlight_color(col)
-  __opts.hl_color = col
+  -- Extract all colour components.
+  local components = Smatch(col, '^(%S+ %S+ %S+) rg$') or Smatch(col, '^(%S+ %S+ %S+ %S+) k$')
+  local is_valid_arg = components
+  if is_valid_arg then
+    -- Validate colour components.
+    for comp in Sgmatch(components, '%S+') do
+      -- Check number syntax.
+      local is_valid_comp = Sfind(comp, '^%d+%.?%d*$') or Sfind(comp, '^%d*%.?%d+$')
+      if is_valid_comp then
+        -- Check number range.
+        comp = tonumber(comp)
+        is_valid_comp = comp >= 0 and comp <= 1
+      end
+      is_valid_arg = is_valid_arg and is_valid_comp
+    end
+  end
+  if is_valid_arg then
+    __opts.hl_color = col
+  else
+    error('package spelling: Error! Invalid PDF colour statement: ' .. tostring(col))
+  end
 end
 M.set_highlight_color = set_highlight_color
 
