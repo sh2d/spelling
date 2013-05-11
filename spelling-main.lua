@@ -20,6 +20,21 @@
 --
 
 
+-- Module identification.
+if luatexbase.provides_module then
+  luatexbase.provides_module(
+    {
+      name        = 'spelling',
+      date        = '2013/00/00',
+      version     = '0.3',
+      description = 'support for spell-checking of LuaTeX documents',
+      author      = 'Stephan Hennig',
+      licence     = 'LPPL ver. 1.3c',
+    }
+  )
+end
+
+
 --- Global table of modules.
 -- The work of the spelling package can be separated into four
 -- stages:<br />
