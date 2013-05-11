@@ -147,53 +147,43 @@ described below, is effectively a wrapper around the Lua interface.
 \subsection{Work-flow}
 \label{sec:work-flow}
 
-The work-flow of the \pkg\ package is as follows:
+Here's a short outline of how using the \pkg\ package fits into the
+general process of compiling a document with Lua\TeX:
 
 \begin{enumerate}
 
-\item After the package is loaded in the preamble of a |.tex| source
-  file via °\usepackage{spelling}°, a list of bad spellings is read from
-  a file named \descr{jobname}|.spell.bad|, if that file exists.
+\item After loading the package in the preamble of a |.tex| source file,
+  a list of bad spellings is read from a file (if that file exists).
 
 \item During the Lua\TeX\ run, text is extracted from pages and all
   words are checked against the list of bad spellings.  Words with a
   known incorrect spelling are highlighted in \acr{pdf} output.
 
 \item At the end of the Lua\TeX\ run, in addition to the \acr{pdf} file,
-  a text file is written, named \descr{jobname}|.spell.txt|, by default.
-  The text file should contain most of the text of the original
+  a text file is written, containing most of the text of the typeset
   document.
 
-\item The text file is then checked by your favourite spell-checker
-  application, \lpeg, Aspell or Hunspell.  The spell-checker should be
-  able to write a list of bad spellings to a file.  Otherwise, visual
-  feedback in \acr{pdf} output won't work.  Preferably, the file is
-  named \descr{jobname}|.spell.bad|, but any other file name works just
-  as well.
+\item The text file is then checked by your favourite external
+  spell-checker application, \lpeg, Aspell or Hunspell.  The
+  spell-checker should be able to write a list of bad spellings to a
+  file.  Otherwise, visual feedback in \acr{pdf} output won't work.
 
-\item Now, there are two ways to proceed:
-
-  \begin{enumerate}
-
-  \item Visually minded people may just compile their document a second
-    time.  This time, file \descr{jobname}|.spell.bad| is read-in again
-    and the words with incorrect spelling found by the spell-checker
-    should now be highlighted in \acr{pdf} output.  Checking the
-    \acr{pdf} file, the necessary corrections to the |.tex| source file
-    can be applied.
-
-  \item If you're not interested in visual feedback or if your
-    spell-checker doesn't provide a non-interactive mode, you can as
-    well apply the necessary corrections directly to the |.tex| source
-    file(s), either interactively, during the spell-checker run, or by
-    looking at the final list of bad spellings in an editor (whatever
-    file it was saved to).  That way, the benefit of this package is,
-    that spell-checker input has already been processed by Lua\TeX, but
-    contains no hyphenated words.
-
-  \end{enumerate}
+\item Visually minded people may now compile their document a second
+  time.  This time, the new list of bad spellings is read-in and words
+  with incorrect spelling found by the spell-checker should now be
+  highlighted in \acr{pdf} output.  Users can then apply the necessary
+  corrections to the |.tex| source file.
 
 \end{enumerate}
+
+Whatever way spell-checker output is employed, users not interested in
+visual feedback (because their spell-checker has an interactive mode
+only or because they prefer grabbing bad spellings from a file directly)
+can also benefit from this package.  Using it, Lua\TeX\ writes a pure
+text file that is particularly well suited as spell-checker input,
+because it contains no hyphenated words (and neither macros, nor active
+characters).  That way, any spell-checker application, even \TeX-unaware
+ones, can be used to check spelling of \TeX\ documents.
 
 
 \subsection{Word lists}
