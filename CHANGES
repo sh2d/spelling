@@ -16,6 +16,10 @@ Fixes:
 
 * Macro `\spellingoutputlinelength` was broken.
 
+* Raising an error when a file cannot be opened for reading causes
+  problems when compiling a document for the first time.  Now, only a
+  warning is written to the console and log file in that case.
+
 
 ### v0.3 (2013-02-12)
 

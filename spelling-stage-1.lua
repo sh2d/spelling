@@ -49,26 +49,41 @@ local __is_bad
 local __is_good
 
 
---- Generic function for parsing a plain list of strings read from a
---- file.
--- All strings found are mapped to the boolean value `true`.  The format
--- of the input file is one string per line.
+--- Generic function for reading bad or good spellings from a file.
+-- All data from the file is read into a string, which is then parsed by
+-- the given parse function.
 --
 -- @param fname  File name.
--- @param t  Table that maps strings to the value `true`.
--- @return Number of total and new strings found.
-local function __parse_plain_list_file(fname, t)
-  local f, err = io.open(fname, 'r')
-  if not f then
-    texio.write_nl('package spelling: Error! Can\'t parse plain word list: file ' .. fname)
-    error(err)
-  end
-  -- Read complete plain file into string, to speed-up file operations.
-  local s = f:read('*all')
-  f:close()
+-- @param parse_string  Custom parse function.
+-- @param t  Mapping table bad or good spellings should be added to.
+-- @param hint  String for info message.  Either `bad` or `good`.
+local function __parse_file(fname, parse_string, t, hint)
   local total_c = 0
   local new_c = 0
-  -- Iterate line-wise through file.
+  local f, err = io.open(fname, 'r')
+  if f then
+    local s = f:read('*all')
+    f:close()
+    total_c, new_c = parse_string(s, t)
+  else
+    texio.write_nl('package spelling: Warning! ' .. err)
+  end
+  texio.write_nl('package spelling: Info! ' .. total_c .. '/' .. new_c .. ' total/new ' .. hint .. ' strings read from file \'' .. fname .. '\'.')
+end
+
+
+--- Generic function for parsing a string containing a plain list of
+-- strings.  Input format are strings separated by new line or carriage
+-- return, i.e., one string per line.  All lines found in the list are
+-- mapped to the boolean value `true` in the given table.
+--
+-- @param s  Input string (a list of strings).
+-- @param t  Table that maps strings to the value `true`.
+-- @return Number of total and new strings found.
+local function __parse_plain_list(s, t)
+  local total_c = 0
+  local new_c = 0
+  -- Iterate line-wise through input string.
   for l in Ugmatch(s, '[^\r\n]+') do
     -- Map string to boolean value `true`.
     if not t[l] then
@@ -88,9 +103,7 @@ end
 --
 -- @param fname  File name.
 local function parse_bad_plain_list_file(fname)
-  local total, new = __parse_plain_list_file(fname, __is_bad)
-  texio.write_nl('package spelling: ' .. total .. ' bad strings ('
-                 .. new .. ' new) read from file \'' .. fname .. '\'.')
+  __parse_file(fname, __parse_plain_list, __is_bad, 'bad')
 end
 M.parse_bad_plain_list_file = parse_bad_plain_list_file
 
@@ -102,9 +115,7 @@ M.parse_bad_plain_list_file = parse_bad_plain_list_file
 --
 -- @param fname  File name.
 local function parse_good_plain_list_file(fname)
-  local total, new = __parse_plain_list_file(fname, __is_good)
-  texio.write_nl('package spelling: ' .. total .. ' good strings ('
-                 .. new .. ' new) read from file \'' .. fname .. '\'.')
+  __parse_file(fname, __parse_plain_list, __is_good, 'good')
 end
 M.parse_good_plain_list_file = parse_good_plain_list_file
 
@@ -223,22 +234,7 @@ end
 --
 -- @param fname  File name.
 local function parse_XML_LanguageTool_file(fname)
-  local f, err = io.open(fname, 'r')
-  if not f then
-    texio.write_nl('package spelling: Error! Can\'t parse LanguageTool XML error report: file ' .. fname)
-    error(err)
-  end
-  -- Read complete XML file into string, since LuaXML has no streaming
-  -- file reader.
-  local s = f:read('*all')
-  f:close()
-  local success, total, new = pcall(__parse_XML_LanguageTool, s)
-  if not success then
-    texio.write_nl('package spelling: Error! Can\'t parse LanguageTool XML error report: file ' .. fname)
-    error(total)
-  end
-  texio.write_nl('package spelling: ' .. total .. ' bad strings ('
-                 .. new .. ' new) read from file \'' .. fname .. '\'.')
+  __parse_file(fname, __parse_XML_LanguageTool, __is_bad, 'bad')
 end
 M.parse_XML_LanguageTool_file = parse_XML_LanguageTool_file
 
