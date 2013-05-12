@@ -144,6 +144,7 @@ local function __parse_XML_LanguageTool(s)
       -- Check XML encoding declaration.
       if attr.encoding == 'UTF-8' then
         is_XML_encoding_UTF_8 = true
+        is_XML_valid = is_XML_encoding_UTF_8 and is_XML_creator_LanguageTool
       else
         error('package spelling: Error! XML data not in the UTF-8 encoding.')
       end
@@ -157,8 +158,11 @@ local function __parse_XML_LanguageTool(s)
           is_XML_creator_LanguageTool = true
           is_XML_valid = is_XML_encoding_UTF_8 and is_XML_creator_LanguageTool
         end
+      -- Check XML data is valid.
+      elseif not is_XML_valid then
+        error('package spelling: Error! No valid LanguageTool XML data.')
       -- Process <error> tags.
-      elseif is_XML_valid and text == 'error' then
+      elseif text == 'error' then
         local ruleid = attr.ruleid
         if ruleid == 'HUNSPELL_RULE'
           or ruleid == 'HUNSPELL_NO_SUGGEST_RULE'
@@ -185,10 +189,6 @@ local function __parse_XML_LanguageTool(s)
   local x = xml.xmlParser(XML_handler)
   -- Parse XML data.
   x:parse(s)
-  -- Check XML data is created by LanguageTool.
-  if not is_XML_creator_LanguageTool then
-    error('package spelling: Error! XML data not created by LanguageTool.')
-  end
   return total_c, new_c
 end
 
