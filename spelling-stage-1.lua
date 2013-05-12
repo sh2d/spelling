@@ -109,18 +109,19 @@ end
 M.parse_good_plain_list_file = parse_good_plain_list_file
 
 
---- Parse LanguageTool XML data.
--- Currently, XML data is only scanned for incorrect spellings.  All
--- strings found in the given XML data (words with known incorrect
--- spelling) are mapped to the boolean value `true` in table `__is_bad`.
+--- Get a custom LanguageTool XML handler.
+-- The returned XML handler scans LanguageTool XML data for incorrect
+-- spellings.  For every incorrect spelling found, the given call-back
+-- function is called with the incorrect spelling string as argument.<br
+-- />
 --
--- @param s  String containing XML data.  XML data is checked for being
--- created by LanguageTool (via attribute <code>software</code> in tag
--- <code>matches</code>) and otherwise ignored.
--- @return Number of total and new incorrect spellings parsed.
-local function __parse_XML_LanguageTool(s)
-  local total_c = 0
-  local new_c = 0
+-- XML data is checked for being created by LanguageTool (via attribute
+-- <code>software</code> in tag <code>matches</code>).
+--
+-- @param cb  Call-back function handling incorrect spellings found in
+-- XML data.
+-- @return XML handler.
+local function __get_XML_handler_LanguageTool(cb)
 
   -- Some flags for checking validity of XML data.  LanguageTool XML
   -- data must declare as being UTF-8 encoded and advertise as being
@@ -171,11 +172,7 @@ local function __parse_XML_LanguageTool(s)
         then
           -- Extract misspelled word from context attribute.
           local word = Usub(attr.context, attr.contextoffset + 1, attr.contextoffset + attr.errorlength)
-          if not __is_bad[word] then
-            __is_bad[word] = true
-            new_c = new_c + 1
-          end
-          total_c = total_c + 1
+          cb(word)
         end
       end
     end,
@@ -185,8 +182,35 @@ local function __parse_XML_LanguageTool(s)
 
   }
 
+  return XML_handler
+end
+
+
+--- Parse a string containing LanguageTool XML data.
+-- All incorrect spellings found in the given XML data are mapped to the
+-- boolean value `true` in the given table.
+--
+-- @param s  String containing XML data.
+-- @param t  Table mapping incorrect spellings to a boolean.
+-- @return Number of total and new incorrect spellings found.
+local function __parse_XML_LanguageTool(s, t)
+  local total_c = 0
+  local new_c = 0
+
+  -- Create call-back for custom LanguageTool XML handler that stores a
+  -- bad word in the given table and does some statistics.
+  local cb_incorrect_spelling = function(word)
+    if not t[word] then
+      t[word] = true
+      new_c = new_c + 1
+    end
+    total_c = total_c + 1
+  end
+
+  -- Create custom XML handler.
+  local XML_handler_LT = __get_XML_handler_LanguageTool(cb_incorrect_spelling)
   -- Create custom XML parser.
-  local x = xml.xmlParser(XML_handler)
+  local x = xml.xmlParser(XML_handler_LT)
   -- Parse XML data.
   x:parse(s)
   return total_c, new_c
