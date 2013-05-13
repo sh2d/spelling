@@ -12,6 +12,9 @@ Changes:
 
 * Improved compatibility with recent LuaTeX versions (v0.74 and newer).
 
+* File `<jobname>.spell.xml` is loaded before file `<jobname>.spell.bad`
+  (if both files exist).
+
 Fixes:
 
 * Macro `\spellingoutputlinelength` was broken.

@@ -244,19 +244,12 @@ M.parse_XML_LanguageTool_file = parse_XML_LanguageTool_file
 -- spelling are mapped to the boolean value `true` in table `__is_bad`.
 -- All strings found in default sources for words with known correct
 -- spelling are mapped to the boolean value `true` in table `__is_good`.
--- Default sources for bad spellings are file `<jobname>.spell.bad` (a
--- plain list file).  Default sources for good spellings are file
--- `<jobname>.spell.good` (a plain list file).
+-- Default sources for bad spellings are files `<jobname>.spell.xml` (a
+-- LanguageTool XML file) and `<jobname>.spell.bad` (a plain list file).
+-- Default sources for good spellings are file `<jobname>.spell.good` (a
+-- plain list file).
 local function parse_default_bad_and_good()
   local fname, f
-  -- Try to read bad spellings from plain list file
-  -- '<jobname>.spell.bad'.
-  fname = tex.jobname .. '.spell.bad'
-  f = io.open(fname, 'r')
-  if f then
-     f:close()
-     parse_bad_plain_list_file(fname)
-  end
   -- Try to read bad spellings from LanguageTool XML file
   -- '<jobname>.spell.xml'.
   fname = tex.jobname .. '.spell.xml'
@@ -264,6 +257,14 @@ local function parse_default_bad_and_good()
   if f then
      f:close()
      parse_XML_LanguageTool_file(fname)
+  end
+  -- Try to read bad spellings from plain list file
+  -- '<jobname>.spell.bad'.
+  fname = tex.jobname .. '.spell.bad'
+  f = io.open(fname, 'r')
+  if f then
+     f:close()
+     parse_bad_plain_list_file(fname)
   end
   -- Try to read good spellings from plain list file
   -- '<jobname>.spell.good'.
