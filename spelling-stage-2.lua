@@ -297,8 +297,8 @@ local function __highlight_by_color()
      local pop = node_new(WHATSIT, PDF_COLORSTACK)
      push.stack = 0
      pop.stack = 0
-     push.cmd = 1
-     pop.cmd = 2
+     push.command = 1
+     pop.command = 2
      push.data = __opts.hl_color
      node_insert_before(__curr_word_start_head, __curr_word_start, push)
      node_insert_after(__curr_word_end_head, __curr_word_end, pop)
