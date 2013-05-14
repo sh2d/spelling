@@ -306,6 +306,29 @@ local function __highlight_by_color()
 end
 
 
+--- Highlight bad spelling by colour (using node field `cmd`).
+-- Insert colour whatsits before and after the first and last nodes
+-- known to belong to the current word.
+-- @see function __highlight_by_color
+local function __highlight_by_color_cmd()
+  -- Check, if start node of current word is a head node.  Inserting
+  -- before head nodes needs special attention.  This is not yet
+  -- implemented.
+  if (__curr_word_start ~= __curr_word_start_head) then
+    -- Create pdf_colorstack whatsit nodes.
+     local push = node_new(WHATSIT, PDF_COLORSTACK)
+     local pop = node_new(WHATSIT, PDF_COLORSTACK)
+     push.stack = 0
+     pop.stack = 0
+     push.cmd = 1
+     pop.cmd = 2
+     push.data = __opts.hl_color
+     node_insert_before(__curr_word_start_head, __curr_word_start, push)
+     node_insert_after(__curr_word_end_head, __curr_word_end, pop)
+  end
+end
+
+
 --- Generic function for highlighting bad spellings.
 local function __highlight_bad_word()
   __highlight_by_color()
@@ -540,9 +563,35 @@ end
 M.disable_word_highlighting = disable_word_highlighting
 
 
+--- Try to maintain compatibility with older LuaTeX versions.
+-- Between LuaTeX 0.70.2 and 0.76.0 node field `cmd` of `whatsits` nodes
+-- of subtype `pdf_colorstack` has been renamed to `command`.  This
+-- function checks which node field is the correct one and activates a
+-- fall-back function in case.  Due to a bug in LuaTeX 0.76.0 (shipped
+-- with TL2013) function `node.has_field()` doesn't return correct
+-- results.  It is therefore tested if an assignment to field `command`
+-- raises an error or not.
+local function __maintain_compatibility()
+  -- Create pdf_colorstack whatsit node.
+  local n = node.new(WHATSIT, PDF_COLORSTACK)
+  -- Function that assigns a value to node field 'command'.
+  local f = function()
+    n.command = 1
+  end
+  -- If the assignment is not successful, fall-back to node field 'cmd'.
+  if not pcall(f) then
+    __highlight_by_color = __highlight_by_color_cmd
+  end
+  -- Delete test node.
+  node.free(n)
+end
+
+
 --- Module initialisation.
 --
 local function __init()
+  -- Try to maintain compatibility with older LuaTeX versions.
+  __maintain_compatibility()
   -- Get local references to package ressources.
   __is_bad = PKG_spelling.res.is_bad
   __is_good = PKG_spelling.res.is_good
