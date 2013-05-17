@@ -52,6 +52,7 @@ _Happy TeXing!_
     spelling.sty
     spelling-doc.bad
     spelling-doc.tex
+    spelling-doc-lst-lua.tex
     spelling-main.lua
     spelling-recurse.lua
     spelling-stage-1.lua

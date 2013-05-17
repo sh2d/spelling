@@ -1,0 +1,84 @@
+%%% spelling-doc-lst-lua.tex
+%%% Copyright 2013 Stephan Hennig
+%%
+%% This work may be distributed and/or modified under the conditions of
+%% the LaTeX Project Public License, either version 1.3 of this license
+%% or (at your option) any later version.  The latest version of this
+%% license is in http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 2005/12/01 or later.
+%%
+\lstdefinelanguage[5.2]{Lua}{%
+  alsoletter={.},%
+  % language keywords
+  morekeywords=[1]{%
+    and,break,do,else,elseif,end,%
+    false,for,function,goto,if,in,%
+    local,nil,not,or,repeat,return,%
+    then,true,until,while,%
+  },%
+  % standard library identifiers
+  morekeywords=[2]{%
+    % basic library
+    assert,collectgarbage,dofile,error,_G,getmetatable,ipairs,%
+    load,loadfile,next,pairs,pcall,print,rawequal,rawget,rawlen,rawset,%
+    select,setmetatable,tonumber,tostring,type,_VERSION,xpcall,%
+    % coroutine library
+    coroutine.create,coroutine.resume,coroutine.running,%
+    coroutine.status,coroutine.wrap,coroutine.yield,%
+    % package library
+    require,package.config,package.cpath,package.loaded,%
+    package.loadlib,package.path,package.preload,package.searchers,%
+    package.searchpath,%
+    % string library
+    string.byte,string.char,string.dump,string.find,string.format,%
+    string.gmatch,string.gsub,string.len,string.lower,string.match,%
+    string.rep,string.reverse,string.sub,string.upper,%
+    % table library
+    table.concat,table.insert,table.pack,table.remove,table.sort,%
+    table.unpack,%
+    % mathematical library
+    math.abs,math.acos,math.asin,math.atan,math.atan2,math.ceil,%
+    math.cos,math.cosh,math.deg,math.exp,math.floor,math.fmod,%
+    math.frexp,math.huge,math.ldexp,math.log,math.max,math.min,%
+    math.modf,math.pi,math.pow,math.rad,math.random,math.randomseed,%
+    math.sin,math.sinh,math.sqrt,math.tan,math.tanh,%
+    % bit library
+    bit32.arshift,bit32.band,bit32.bnot,bit32.bor,bit32.btest,%
+    bit32.bxor,bit32.extract,bit32.replace,bit32.lrotate,bit32.lshift,%
+    bit32.rrotate,bit32.rshift,%
+    % io library
+    io.close,io.flush,io.input,io.lines,io.open,io.output,io.popen,%
+    io.read,io.stderr,io.stdin,io.stdout,io.tmpfile,io.type,io.write,%
+    % os library
+    os.clock,os.date,os.difftime,os.execute,os.exit,os.getenv,%
+    os.remove,os.rename,os.setlocale,os.time,os.tmpname,%
+    % debug library
+    debug.debug,debug.gethook,debug.getinfo,debug.getlocal,%
+    debug.getmetatable,debug.getregistry,debug.getupvalue,%
+    debug.getuservalue,debug.sethook,debug.setlocal,debug.setmetatable,%
+    debug.setupvalue,debug.setuservalue,debug.traceback,%
+    debug.upvalueid,debug.upvaluejoin,%
+  },%
+  % add environment
+  morekeywords=[2]{_ENV},%
+  %
+  sensitive=true,%
+  % single line comments
+  morecomment=[l]{--},%
+  % multi line comments
+  morecomment=[s]{--[[}{]]},%
+  morecomment=[s]{--[=[}{]=]},%
+  morecomment=[s]{--[==[}{]==]},%
+  morecomment=[s]{--[===[}{]===]},%
+  % backslash escaped strings
+  morestring=[b]",%
+  morestring=[b]',%
+  % multi line strings
+  morestring=[s]{[[}{]]},%
+  morestring=[s]{[=[}{]=]},%
+  morestring=[s]{[==[}{]==]},%
+  morestring=[s]{[===[}{]===]},%
+  % labels
+  moredelim=[s][keywordstyle3]{::}{::},%
+}[keywords,comments,strings]%
