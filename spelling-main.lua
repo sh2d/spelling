@@ -16,7 +16,7 @@
 --
 -- @author Stephan Hennig
 -- @copyright 2012, 2013 Stephan Hennig
--- @release version 0.3
+-- @release version 0.4
 --
 
 
@@ -25,8 +25,8 @@ if luatexbase.provides_module then
   luatexbase.provides_module(
     {
       name        = 'spelling',
-      date        = '2013/00/00',
-      version     = '0.3',
+      date        = '2013/05/23',
+      version     = '0.4',
       description = 'support for spell-checking of LuaTeX documents',
       author      = 'Stephan Hennig',
       licence     = 'LPPL ver. 1.3c',
