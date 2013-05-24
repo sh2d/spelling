@@ -2,6 +2,14 @@ This material is subject to the LaTeX Project Public License. See
 <http://www.latex-project.org/lppl/> for the details of that license.
 
 
+### v0.xx (2013-xx-xx)
+
+Fixes:
+
+* Fixed compatibility issue with LuaTeX 0.70.2 that caused text output
+  file written to be emtpy.
+
+
 ### v0.4 (2013-05-23)
 
 New features:

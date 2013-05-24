@@ -165,8 +165,9 @@ PKG_spelling = {}
 --- Determine unique IDs for user-defined whatsit nodes used by this
 -- package.  Package luatexbase provides user-defined whatsit node ID
 -- allocation since version v0.6 (TL 2013).  For older package versions,
--- we start allocating at an arbitrary hard-coded value of 35**8
--- (ca. 2**41).
+-- we start allocating at an arbitrary hard-coded value of 13**8
+-- (ca. 2**30).  Note, for compatibility with LuaTeX 0.70.2, the value
+-- must be less than 2^31.
 --
 -- @return Table mapping names to IDs.
 local function __allocate_whatsit_ids()
@@ -176,7 +177,7 @@ local function __allocate_whatsit_ids()
     ids.start_tag = luatexbase.new_user_whatsit_id('start_tag', 'spelling')
     ids.end_tag = luatexbase.new_user_whatsit_id('end_tag', 'spelling')
   else
-    local uid = 35^8
+    local uid = 13^8
     ids.start_tag = uid + 1
     ids.end_tag = uid + 2
   end
